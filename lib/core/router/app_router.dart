@@ -11,13 +11,17 @@ import 'package:vesta_app/screens/dashboard_screen.dart';
 import 'package:vesta_app/screens/filters_screen.dart';
 import 'package:vesta_app/screens/home_screen.dart';
 import 'package:vesta_app/screens/reports_screen.dart';
+import 'package:vesta_app/screens/privacy_consent_screen.dart';
 import 'package:vesta_app/widgets/link_access_gate.dart';
+import 'package:vesta_app/widgets/privacy_access_gate.dart';
 
 class AppRouter {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   Widget _protected(Widget screen) {
-    return LinkAccessGate(child: screen);
+    return PrivacyAccessGate(
+      child: LinkAccessGate(child: screen),
+    );
   }
 
   late final GoRouter router = GoRouter(
@@ -67,19 +71,27 @@ class AppRouter {
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
+        path: '/privacy',
+        builder: (context, state) => const PrivacyConsentScreen(),
+      ),
+      GoRoute(
         path: '/add-child',
-        builder: (context, state) => LinkAccessGate(
-          allowWhenNoChildren: true,
-          child: AddChildScreen(
-            childData: state.extra as Map<String, dynamic>?,
+        builder: (context, state) => PrivacyAccessGate(
+          child: LinkAccessGate(
+            allowWhenNoChildren: true,
+            child: AddChildScreen(
+              childData: state.extra as Map<String, dynamic>?,
+            ),
           ),
         ),
       ),
       GoRoute(
         path: '/crear-hijo',
-        builder: (context, state) => LinkAccessGate(
-          allowWhenNoChildren: true,
-          child: const CrearHijoScreen(),
+        builder: (context, state) => PrivacyAccessGate(
+          child: LinkAccessGate(
+            allowWhenNoChildren: true,
+            child: const CrearHijoScreen(),
+          ),
         ),
       ),
       GoRoute(

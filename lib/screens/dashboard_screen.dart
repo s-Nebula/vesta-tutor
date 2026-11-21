@@ -70,6 +70,11 @@ class DashboardScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Privacidad y autorizaciones',
+            onPressed: () => context.push('/privacy'),
+            icon: const Icon(Icons.privacy_tip_outlined),
+          ),
+          IconButton(
             tooltip: 'Cerrar sesión',
             onPressed: () => AuthService().signOut(),
             icon: const Icon(Icons.logout_rounded),

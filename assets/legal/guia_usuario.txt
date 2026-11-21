@@ -1,0 +1,389 @@
+VESTA SECURITY
+
+Guía de usuario
+
+Cómo instalar, vincular y utilizar Vesta Padre y Vesta Tracker de forma responsable.
+
+Versión | 1.0
+
+Fecha de publicación | 20 de noviembre de 2026
+
+Última actualización | 20 de noviembre de 2026
+
+Responsable del servicio | FORBIDDEN S.A.S.
+
+Autor del proyecto | Nebula
+
+Contacto | nebulagnu@proton.me
+
+Jurisdicción | República de Colombia
+
+FORBIDDEN S.A.S.
+
+NIT 901653270-2 · Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia
+
+nebulagnu@proton.me · +57 324 616 7956
+
+Contenido
+
+1. Bienvenido a Vesta
+
+2. Requisitos
+
+3. Instalación
+
+4. Vinculación de los dispositivos
+
+5. Permisos y funcionamiento
+
+6. Panel de Vesta Padre
+
+7. Cómo configurar reglas
+
+8. Desvincular un dispositivo
+
+9. Privacidad y derechos
+
+10. Solución de problemas
+
+11. Uso responsable
+
+12. Contacto y soporte
+
+1. Bienvenido a Vesta
+
+Vesta Security es una plataforma de supervisión y protección digital familiar compuesta por dos aplicaciones Android independientes:
+
+Vesta Padre: aplicación para que el padre, madre o representante legal administre perfiles, configure reglas de protección y consulte la información del dispositivo vinculado.
+
+Vesta Tracker: aplicación instalada en el dispositivo del menor, encargada de transmitir información autorizada y aplicar las reglas de protección configuradas.
+
+Vesta está diseñada para facilitar la supervisión responsable del entorno digital de niños, niñas y adolescentes.
+
+Su utilización debe respetar la intimidad, la dignidad, la autonomía progresiva y los derechos fundamentales del menor.
+
+Vesta no sustituye el acompañamiento familiar, la educación digital ni la atención de emergencias.
+
+2. Requisitos
+
+Para utilizar Vesta se necesita:
+
+Dos dispositivos Android compatibles.
+
+Conexión a Internet.
+
+Una cuenta de usuario para Vesta Padre.
+
+Vesta Tracker instalado en el dispositivo que será supervisado.
+
+Permisos de ubicación y funcionamiento en segundo plano.
+
+Permiso de acceso a estadísticas de uso, cuando se desee utilizar esa función.
+
+Permiso de accesibilidad, necesario para aplicar el bloqueo de aplicaciones y detectar dominios en el navegador compatible.
+
+Autorización del representante legal para el tratamiento de los datos personales del menor y participación del menor de acuerdo con su edad, madurez y capacidad de comprensión.
+
+La disponibilidad de funciones puede variar según la versión de Android, el fabricante y las restricciones del dispositivo.
+
+3. Instalación
+
+3.1. Vesta Padre
+
+Descarga Vesta Padre desde el canal oficial de distribución.
+
+Instala la aplicación en el dispositivo del padre o tutor.
+
+Abre Vesta Padre.
+
+Registra una cuenta o inicia sesión.
+
+Consulta y acepta los documentos legales vigentes.
+
+Completa la información solicitada.
+
+Los métodos de autenticación disponibles pueden incluir correo electrónico y contraseña, Google y GitHub, según la versión distribuida.
+
+3.2. Vesta Tracker
+
+Descarga Vesta Tracker desde el canal oficial.
+
+Instálala en el dispositivo que será supervisado.
+
+Abre la aplicación.
+
+Consulta la información sobre los permisos y el tratamiento de datos.
+
+Completa el proceso de vinculación.
+
+Concede los permisos que hayas autorizado para las funciones seleccionadas.
+
+No instales Vesta Tracker en un dispositivo sin informar a su usuario y sin contar con la autoridad y las autorizaciones legalmente necesarias.
+
+4. Vinculación de los dispositivos
+
+La vinculación permite asociar Vesta Padre con Vesta Tracker.
+
+Desde Vesta Padre
+
+Inicia sesión.
+
+Crea un perfil para el menor.
+
+Introduce la información solicitada.
+
+Genera el código de vinculación.
+
+Mantén el código disponible para completar el proceso en Tracker.
+
+Desde Vesta Tracker
+
+Abre Vesta Tracker.
+
+Introduce el código generado por Vesta Padre.
+
+Completa la autenticación del dispositivo.
+
+Acepta los permisos necesarios.
+
+Espera la confirmación de vinculación.
+
+Los códigos de vinculación son de uso limitado. No los compartas con personas no autorizadas.
+
+Una vez completado el proceso, Vesta Padre podrá consultar la información disponible del dispositivo asociado.
+
+5. Permisos y funcionamiento
+
+Android exige permisos específicos para determinadas funciones. Vesta explica su finalidad antes de solicitarlos.
+
+5.1. Ubicación
+
+El permiso de ubicación permite que Tracker obtenga coordenadas geográficas del dispositivo y las transmita a Vesta para que el administrador autorizado pueda consultar su ubicación.
+
+La función puede requerir:
+
+Ubicación precisa.
+
+Acceso a ubicación en segundo plano.
+
+Servicio de ubicación en primer plano.
+
+Conexión a Internet.
+
+La aplicación puede continuar recopilando ubicación mientras opera en segundo plano si el usuario concede los permisos correspondientes.
+
+La frecuencia de actualización depende del GPS, Android, el fabricante, la batería, la conectividad y otras condiciones. Vesta no garantiza una actualización exacta ni disponibilidad continua.
+
+5.2. Acceso a estadísticas de uso
+
+Este permiso permite recopilar estadísticas de utilización de aplicaciones, como:
+
+Aplicaciones utilizadas.
+
+Tiempo de uso en primer plano.
+
+Número de aperturas.
+
+Tiempo total de pantalla.
+
+Fecha del informe.
+
+La información se utiliza para presentar resúmenes de actividad digital.
+
+5.3. Accesibilidad
+
+El servicio de accesibilidad permite detectar cuándo se abre una aplicación configurada como bloqueada y, en el navegador compatible, identificar la dirección del dominio que se intenta visitar.
+
+El permiso puede permitir que Android exponga información de las ventanas activas. Vesta utiliza ese acceso únicamente para las funciones descritas en su Política de Privacidad.
+
+No se debe interpretar este permiso como autorización para recopilar indiscriminadamente mensajes, contraseñas, fotografías o el contenido general de otras aplicaciones.
+
+5.4. VPN local para filtrado DNS
+
+Vesta Tracker puede utilizar el servicio VPN de Android para procesar consultas DNS y aplicar reglas de bloqueo de dominios.
+
+Esta VPN se utiliza para filtrado local. No es un servicio de anonimización ni una VPN comercial para ocultar la dirección IP.
+
+Las consultas DNS permitidas se reenvían al servidor DNS disponible en la red del dispositivo. Las consultas correspondientes a dominios bloqueados reciben una respuesta de error.
+
+5.5. Notificaciones y ejecución en segundo plano
+
+Android puede solicitar permiso para mostrar notificaciones y mantener servicios en primer plano.
+
+Estas notificaciones informan de que determinadas funciones de Vesta están activas, como el rastreo o la protección DNS.
+
+6. Panel de Vesta Padre
+
+Desde Vesta Padre, el administrador podrá utilizar las funciones habilitadas en la versión instalada.
+
+Perfiles
+
+Permite consultar y administrar los perfiles vinculados a la cuenta autorizada.
+
+Ubicación
+
+Permite consultar la última ubicación recibida del dispositivo y la información histórica disponible.
+
+La ubicación puede aparecer desactualizada si el dispositivo está apagado, sin batería, sin señal GPS, sin Internet o si Android restringe la actividad en segundo plano.
+
+Alertas
+
+Las alertas informan sobre eventos relevantes, entre ellos:
+
+Batería baja.
+
+Velocidad superior al umbral configurado.
+
+Intentos de abrir aplicaciones bloqueadas.
+
+Intentos de acceder a dominios bloqueados.
+
+Las alertas pueden mostrar fecha, hora, tipo de evento y datos técnicos asociados.
+
+El administrador podrá eliminar alertas individuales desde la interfaz habilitada. Eliminar una alerta no equivale a eliminar el historial de ubicación, los informes de uso ni el resto de los datos.
+
+Reglas de protección
+
+El administrador puede configurar reglas de bloqueo de aplicaciones y dominios, así como excepciones de dominios permitidos cuando la función esté disponible.
+
+Las reglas se aplican en el dispositivo Tracker cuando este recibe y procesa la configuración.
+
+La efectividad depende de la compatibilidad del sistema operativo, el navegador, la conectividad y las limitaciones técnicas de Android.
+
+7. Cómo configurar reglas
+
+Bloquear una aplicación
+
+Abre la sección de administración de aplicaciones.
+
+Selecciona la aplicación que deseas restringir.
+
+Añade la regla de bloqueo.
+
+Guarda los cambios.
+
+Espera a que Tracker reciba la configuración.
+
+Bloquear un dominio
+
+Abre la sección de filtros.
+
+Introduce el dominio que deseas restringir.
+
+Guarda la regla.
+
+Comprueba que el dispositivo Tracker esté conectado.
+
+Las reglas de dominio pueden aplicarse al dominio indicado y a sus subdominios, según el mecanismo de coincidencia implementado.
+
+Permitir un dominio
+
+Abre la sección de filtros.
+
+Añade el dominio a la lista de permitidos.
+
+Guarda los cambios.
+
+Espera la sincronización.
+
+La regla más específica determina el resultado cuando existen reglas de bloqueo y permiso que coinciden. En caso de empate, prevalece la regla permitida.
+
+8. Desvincular un dispositivo
+
+La desvinculación separa el dispositivo Tracker del perfil correspondiente.
+
+Antes de hacerlo, ten presente que desvincular no significa eliminar todos los datos históricos.
+
+La información almacenada debe gestionarse mediante los controles de privacidad y eliminación disponibles en la versión correspondiente.
+
+Para volver a vincular el dispositivo será necesario generar y utilizar un nuevo código.
+
+9. Privacidad y derechos
+
+FORBIDDEN S.A.S. es responsable del tratamiento de los datos personales gestionados por Vesta.
+
+El usuario puede solicitar:
+
+Consulta de sus datos.
+
+Corrección o actualización.
+
+Prueba de la autorización.
+
+Información sobre el uso de sus datos.
+
+Revocación de la autorización cuando proceda.
+
+Supresión de datos cuando sea legalmente procedente.
+
+Las solicitudes deben dirigirse a:
+
+Correo: nebulagnu@proton.me
+
+Dirección: Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia.
+
+Cuando se trate de datos de menores, las solicitudes deberán presentarse por las personas legalmente facultadas, respetando también los derechos del menor.
+
+10. Solución de problemas
+
+No aparece la ubicación
+
+Comprueba que el GPS esté activado.
+
+Revisa los permisos de ubicación.
+
+Comprueba que Tracker tenga autorización para operar en segundo plano.
+
+Verifica la conexión a Internet.
+
+Comprueba que el dispositivo tenga batería.
+
+No se actualizan las alertas
+
+Comprueba la conectividad.
+
+Verifica que los dispositivos sigan vinculados.
+
+Revisa que Tracker tenga los permisos necesarios.
+
+Comprueba que las reglas estén sincronizadas.
+
+No se bloquean aplicaciones
+
+Comprueba que el servicio de accesibilidad esté activado.
+
+Verifica que la aplicación figure en la lista de bloqueo.
+
+Comprueba que Tracker no esté restringido por el fabricante.
+
+No se bloquean dominios
+
+Comprueba que la VPN DNS esté activa.
+
+Verifica las reglas configuradas.
+
+Comprueba que el navegador sea compatible con la detección de dominios.
+
+Ten en cuenta que el uso de DNS cifrado, navegadores alternativos y mecanismos propios de resolución puede limitar la efectividad del filtrado.
+
+El servicio se detiene
+
+Algunos fabricantes aplican restricciones agresivas de batería. Revisa la configuración de batería y ejecución en segundo plano de Android.
+
+11. Uso responsable
+
+Vesta debe utilizarse para protección familiar legítima y no para vigilancia abusiva, acoso, intimidación, control de terceros o acceso no autorizado a dispositivos.
+
+El administrador debe explicar al menor, de manera apropiada para su edad, qué funciones están activas y qué información se recopila.
+
+12. Contacto y soporte
+
+FORBIDDEN S.A.S.
+Proyecto: Vesta Security
+Correo: nebulagnu@proton.me
+Teléfono: +57 324 616 7956
+Dirección: Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia.
+
+© 2026 Vesta Security. Todos los derechos reservados, sin perjuicio de las licencias de software de código abierto aplicables.
+
+© 2026 Vesta Security · FORBIDDEN S.A.S.. Documento oficial, versión 1.0. La versión vigente se publica en las aplicaciones y en el sitio web de Vesta.

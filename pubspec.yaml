@@ -40,11 +40,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-   - assets/brand/vesta_logo.png
-   - assets/brand/vesta_simbolo.png
-   - assets/google.png
-   - assets/apple.png
-   - assets/github.png
+    - assets/legal/terminos_y_condiciones.txt
+    - assets/legal/politica_privacidad.txt
+    - assets/legal/guia_usuario.txt
+    - assets/brand/vesta_logo.png
+    - assets/brand/vesta_simbolo.png
+    - assets/google.png
+    - assets/apple.png
+    - assets/github.png
 
 dependency_overrides:
   archive: 4.4.0
