@@ -1,0 +1,92 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+*.key
+*.pem
+.env
+
+# VESTA - archivos locales y sensibles
+*.bak
+*.bak.*
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+.env*
+!.env.example
+.DS_Store
+
+# Archivos generados y dependencias
+node_modules/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+.nyc_output/
+
+# Respaldos locales
+android.backup/
+ios.backup/
+macos.backup/
+
+# Respaldos adicionales: no publicar
+*.backup
+*.backup.*
+*.backup_*
+*.bak_*
+*.pre_backend_sync
+backup/
+backups/
+backup_*/
+
+# Respaldos y archivos temporales adicionales
+*.bak-*
+*.bak.*
+*.pre_*
+*.tmp
+errores_android.txt
+/Error_
+/Failed

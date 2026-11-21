@@ -1,0 +1,57 @@
+name: vesta_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.19.0
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  cloud_firestore: ^6.3.0
+  firebase_messaging: ^16.2.0
+  shared_preferences: ^2.3.0
+  flutter_background_service: ^5.0.5
+  provider: ^6.1.5+1
+  go_router: ^15.1.2
+  flutter_local_notifications: ^19.5.0
+  geolocator: ^13.0.2
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  webview_flutter: ^4.8.0
+  cupertino_icons: ^1.0.6
+  google_sign_in: ^6.2.2
+  url_launcher: ^6.3.1
+  http: ^1.4.0
+  fl_chart: ^1.2.0
+  pdf: ^3.11.3
+  printing: ^5.14.3
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+   - assets/brand/vesta_logo.png
+   - assets/brand/vesta_simbolo.png
+   - assets/google.png
+   - assets/apple.png
+   - assets/github.png
+
+dependency_overrides:
+  archive: 4.4.0
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/brand/vesta_simbolo.png"
+  adaptive_icon_background: "#F4EDEA"
+  adaptive_icon_foreground: "assets/brand/vesta_simbolo.png"
