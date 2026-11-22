@@ -449,9 +449,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 20, 18, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
+        // The whole screen scrolls as one page: with the header, the web
+        // protection card and the form above, a list limited to the space
+        // left below was only a few pixels tall on small phones.
+        child: ListView(
+          padding: const EdgeInsets.only(top: 20, bottom: 24),
           children: [
             Row(
               children: [
@@ -638,13 +641,15 @@ class _FiltersScreenState extends State<FiltersScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: _getRulesStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: _rose),
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: CircularProgressIndicator(color: _rose),
+                      ),
                     );
                   }
 
@@ -714,7 +719,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    // Scrolls with the page (see the ListView above).
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
                     itemCount: rules.length,
                     itemBuilder: (context, index) {
                       final doc = rules[index];
@@ -809,7 +817,6 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     },
                   );
                 },
-              ),
             ),
           ],
         ),
