@@ -6,6 +6,7 @@ import 'package:vesta_app/services/alert_read_state.dart';
 import 'package:vesta_app/services/notification_service.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 
+import 'package:vesta_app/l10n/alert_text.dart';
 import 'package:vesta_app/l10n/tr.dart';
 class AlertsScreen extends StatefulWidget {
   final String childId;
@@ -69,9 +70,10 @@ class _AlertsScreenState extends State<AlertsScreen> {
       final data = change.doc.data();
       if (data == null) continue;
 
+      final text = AlertText.of(data);
       NotificationService.instance.mostrarNotificacionInmediata(
-        titulo: data['title']?.toString() ?? tr('Alerta'),
-        subtitulo: data['subtitle']?.toString() ?? tr('Incidente registrado'),
+        titulo: text.title,
+        subtitulo: text.body,
         tipo: data['type']?.toString() ?? 'critical',
         alertId: change.doc.id,
         childId: widget.childId,
@@ -316,6 +318,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       );
 
   Widget _buildAlertaCard(String alertId, Map<String, dynamic> data) {
+    final text = AlertText.of(data);
     final type = data['type']?.toString();
     final accent = _colorFor(type);
     final date = AlertReadState.alertDate(data);
@@ -378,7 +381,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            data['title']?.toString() ?? tr('Alerta'),
+                            text.title,
                             style: TextStyle(
                               color: VestaTheme.textPrimary,
                               fontWeight: FontWeight.w800,
@@ -408,7 +411,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      data['subtitle']?.toString() ?? '',
+                      text.body,
                       style: TextStyle(
                         color: VestaTheme.textSecondary,
                         fontSize: 12,
