@@ -927,4 +927,40 @@ const Map<String, String> enStrings = {
       'LANGUAGE',
   'críticas':
       'critical',
+  'Escribe tu contraseña.':
+      'Enter your password.',
+  'No se pudo confirmar tu identidad.':
+      'Your identity could not be confirmed.',
+  'Inicia sesión con la misma cuenta que quieres eliminar.':
+      'Sign in with the same account you want to delete.',
+  'Por seguridad, vuelve a iniciar sesión antes de eliminar la cuenta.':
+      'For security, sign in again before deleting the account.',
+  'Eliminar cuenta':
+      'Delete account',
+  'Borra tu cuenta y tus datos de forma definitiva':
+      'Permanently delete your account and data',
+  'Tu cuenta y tus datos se eliminaron.':
+      'Your account and data were deleted.',
+  'Esta acción no se puede deshacer.':
+      'This cannot be undone.',
+  'Se eliminan tu cuenta, tu correo y tus preferencias.':
+      'Your account, e-mail address and preferences are deleted.',
+  'Se eliminan los perfiles de los que eres el único tutor, con su ubicación, alertas, informes, reglas, zonas y peticiones.':
+      'Profiles where you are the only guardian are deleted, with their location, alerts, reports, rules, zones and requests.',
+  'Los teléfonos vinculados a esos perfiles quedan desvinculados y Vesta Tracker deja de enviar datos.':
+      'Phones linked to those profiles are unlinked and Vesta Tracker stops sending data.',
+  'En los perfiles que compartes con otro tutor solo se quita tu acceso; el otro tutor los conserva.':
+      'In profiles you share with another guardian only your access is removed; the other guardian keeps them.',
+  'Se eliminan tus consentimientos. Solo queda un registro anónimo de que la eliminación se hizo.':
+      'Your consents are deleted. Only an anonymous record that the deletion took place is kept.',
+  'Por seguridad, confirma tu contraseña.':
+      'For security, confirm your password.',
+  'Por seguridad, te pediremos que vuelvas a iniciar sesión.':
+      'For security, we will ask you to sign in again.',
+  'Entiendo que se eliminarán mi cuenta y mis datos.':
+      'I understand that my account and data will be deleted.',
+  'Eliminar cuenta definitivamente':
+      'Delete account permanently',
+  'También puedes pedir la eliminación sin la app en vestasecurity.date/eliminar-cuenta.':
+      'You can also request deletion without the app at vestasecurity.date/en/delete-account.',
 };

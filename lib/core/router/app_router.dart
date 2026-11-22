@@ -11,6 +11,7 @@ import 'package:vesta_app/screens/filters_screen.dart';
 import 'package:vesta_app/screens/home_screen.dart';
 import 'package:vesta_app/screens/reports_screen.dart';
 import 'package:vesta_app/screens/privacy_consent_screen.dart';
+import 'package:vesta_app/screens/delete_account_screen.dart';
 import 'package:vesta_app/screens/settings_screen.dart';
 import 'package:vesta_app/widgets/link_access_gate.dart';
 import 'package:vesta_app/widgets/privacy_access_gate.dart';
@@ -85,6 +86,10 @@ class AppRouter {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/delete-account',
+        builder: (context, state) => const DeleteAccountScreen(),
       ),
       GoRoute(
         path: '/privacy',

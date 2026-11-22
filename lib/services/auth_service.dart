@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:vesta_app/services/api_client.dart';
 import 'package:vesta_app/services/notification_service.dart';
 
 import 'package:vesta_app/l10n/tr.dart';
@@ -146,6 +147,70 @@ class AuthService {
     }
   }
 
+  /// True when the account signs in with e-mail and password, so deleting it
+  /// asks for the password again.
+  bool get usesPassword =>
+      currentUser?.providerData.any((p) => p.providerId == 'password') ?? false;
+
+  /// Signs the guardian in again. The server only deletes an account with a
+  /// recent sign-in. Returns false if the guardian cancelled.
+  Future<bool> _reauthenticate({String? password}) async {
+    final user = currentUser;
+    if (user == null) throw Exception(tr('No existe una sesión autenticada.'));
+    final providers = user.providerData.map((p) => p.providerId).toSet();
+
+    try {
+      if (providers.contains('password')) {
+        final email = user.email;
+        if (email == null || password == null || password.isEmpty) {
+          throw Exception(tr('Escribe tu contraseña.'));
+        }
+        await user.reauthenticateWithCredential(
+          EmailAuthProvider.credential(email: email, password: password),
+        );
+      } else if (providers.contains('google.com')) {
+        await _googleSignIn.signOut().catchError((_) => null);
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) return false;
+        final googleAuth = await googleUser.authentication;
+        await user.reauthenticateWithCredential(
+          GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          ),
+        );
+      } else if (providers.contains('github.com')) {
+        await user.reauthenticateWithProvider(GithubAuthProvider());
+      } else {
+        throw Exception(tr('No se pudo confirmar tu identidad.'));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'web-context-canceled' || e.code == 'canceled') return false;
+      throw Exception(_handleAuthError(e.code));
+    }
+
+    // Fresh token with the new sign-in time for the API call.
+    await user.getIdToken(true);
+    return true;
+  }
+
+  /// Deletes the guardian's account and data on the server, then signs out
+  /// locally. Returns false if the guardian cancelled the sign-in.
+  Future<bool> deleteAccount({String? password}) async {
+    if (!await _reauthenticate(password: password)) return false;
+
+    await VestaApiClient.delete('/api/account');
+
+    // The server already removed the account and its push tokens.
+    try {
+      await _auth.signOut();
+    } catch (_) {}
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
+    return true;
+  }
+
   String _handleAuthError(String code) {
     switch (code) {
       case 'invalid-credential':
@@ -169,6 +234,10 @@ class AuthService {
         return tr('Esta cuenta ha sido deshabilitada.');
       case 'account-exists-with-different-credential':
         return tr('Ya existe una cuenta con este correo usando otro método de acceso.');
+      case 'user-mismatch':
+        return tr('Inicia sesión con la misma cuenta que quieres eliminar.');
+      case 'requires-recent-login':
+        return tr('Por seguridad, vuelve a iniciar sesión antes de eliminar la cuenta.');
       case 'credential-already-in-use':
         return tr('Estas credenciales ya están vinculadas a otra cuenta.');
       default:

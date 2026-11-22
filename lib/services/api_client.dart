@@ -44,6 +44,9 @@ class VestaApiClient {
   }) =>
       _send('POST', path, body);
 
+  static Future<Map<String, dynamic>> delete(String path) =>
+      _send('DELETE', path, null);
+
   static Future<Map<String, dynamic>> patch(
     String path, {
     required Map<String, dynamic> body,

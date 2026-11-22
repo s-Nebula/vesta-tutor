@@ -193,6 +193,16 @@ class SettingsScreen extends StatelessWidget {
                   title: Text(tr('Cerrar sesión')),
                   onTap: () => _signOut(context),
                 ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.delete_forever_rounded, color: VestaTheme.danger),
+                  title: Text(
+                    tr('Eliminar cuenta'),
+                    style: const TextStyle(color: VestaTheme.danger),
+                  ),
+                  subtitle: Text(tr('Borra tu cuenta y tus datos de forma definitiva')),
+                  onTap: () => context.push('/delete-account'),
+                ),
               ],
             ),
           ),
