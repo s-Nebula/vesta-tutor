@@ -162,6 +162,10 @@ class NotificationService {
     });
   }
 
+  /// Call after the user changes the app language, so the server sends
+  /// this device's pushes in the new language.
+  Future<void> syncLanguage() => _saveCurrentToken();
+
   Future<void> _saveCurrentToken() async {
     try {
       final token = await _fcm.getToken();
@@ -184,8 +188,10 @@ class NotificationService {
         'role': 'tutor',
       }, SetOptions(merge: true));
 
+      // `lang` tells the server which language to write this device's pushes in.
       await userRef.collection('fcmTokens').doc(token).set({
         'token': token,
+        'lang': appLanguage,
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {

@@ -8,6 +8,7 @@ import 'package:vesta_app/theme/vesta_theme.dart';
 import 'package:vesta_app/theme_notifier.dart';
 
 import 'package:vesta_app/l10n/tr.dart';
+import 'package:vesta_app/services/notification_service.dart';
 /// Guardian settings: appearance, language, notifications, privacy and account.
 ///
 /// Notification preferences are stored in `users/{uid}`
@@ -124,7 +125,10 @@ class SettingsScreen extends StatelessWidget {
                   const ButtonSegment(value: 'en', label: Text('English')),
                 ],
                 selected: {language.choice},
-                onSelectionChanged: (value) => language.setChoice(value.first),
+                onSelectionChanged: (value) {
+                  language.setChoice(value.first);
+                  NotificationService.instance.syncLanguage();
+                },
               ),
             ),
           ),
