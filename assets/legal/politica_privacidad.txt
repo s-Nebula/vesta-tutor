@@ -76,7 +76,7 @@ Razón social: FORBIDDEN S.A.S.
 NIT: 901653270-2
 Matrícula mercantil: 262746
 Cámara de Comercio: Santa Marta para el Magdalena
-Domicilio: Santa Marta, Magdalena, Colombia.
+Domicilio: Cra 28 #12-50, Santa Marta, Magdalena, Colombia.
 Correo para privacidad y solicitudes: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 Área responsable de atender consultas y reclamos: Protección de Datos Personales de FORBIDDEN S.A.S., a través del correo nebulagnu@proton.me.
@@ -842,7 +842,7 @@ Para consultas, reclamos, solicitudes de eliminación, revocación o cualquier a
 FORBIDDEN S.A.S.
 NIT: 901653270-2
 Proyecto: Vesta Security
-Domicilio: Santa Marta, Magdalena, Colombia.
+Domicilio: Cra 28 #12-50, Santa Marta, Magdalena, Colombia.
 Correo: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 

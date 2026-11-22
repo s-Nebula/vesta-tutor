@@ -78,7 +78,7 @@ Company name: FORBIDDEN S.A.S.
 Tax ID (NIT): 901653270-2
 Commercial registration: 262746
 Chamber of Commerce: Santa Marta para el Magdalena
-Registered office: Santa Marta, Magdalena, Colombia.
+Registered office: Cra 28 #12-50, Santa Marta, Magdalena, Colombia.
 Email for privacy matters and requests: nebulagnu@proton.me
 Phone: +57 324 616 7956.
 Department responsible for enquiries and complaints: Personal Data Protection at FORBIDDEN S.A.S., through the email address nebulagnu@proton.me.
@@ -844,7 +844,7 @@ For enquiries, complaints, deletion requests, withdrawal or any matter related t
 FORBIDDEN S.A.S.
 Tax ID (NIT): 901653270-2
 Project: Vesta Security
-Registered office: Santa Marta, Magdalena, Colombia.
+Registered office: Cra 28 #12-50, Santa Marta, Magdalena, Colombia.
 Email: nebulagnu@proton.me
 Phone: +57 324 616 7956.
 
