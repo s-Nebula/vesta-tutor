@@ -1,12 +1,11 @@
-VESTA SECURITY — DOCUMENTOS OFICIALES v1.0
-Fecha de publicación/entrada en vigor: 20 de noviembre de 2026.
+VESTA SECURITY — DOCUMENTOS OFICIALES v1.1
+Fecha de entrada en vigor: 22 de noviembre de 2026.
 
 Contenido:
-- assets/legal/terminos_y_condiciones.txt
-- assets/legal/politica_privacidad.txt
-- assets/legal/guia_usuario.txt
-- assets/legal/originals/: documentos DOCX originales recibidos.
+- terminos_y_condiciones.txt
+- politica_privacidad.txt
+- guia_usuario.txt
+- originals/: documentos DOCX fuente (v1.1).
 
-Los archivos TXT son extracciones fieles del texto de los DOCX para mostrarlos dentro
-de la aplicación. Se conservan los párrafos y las tablas; no se ha reescrito el contenido.
-Registrar los TXT en pubspec.yaml como assets antes de usarlos con rootBundle.
+Los TXT se generan desde los DOCX conservando párrafos y tablas.
+La versión 1.0 está archivada en vesta-build/backups/legal_docs_v1.0_*.tar.gz.

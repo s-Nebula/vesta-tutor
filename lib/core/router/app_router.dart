@@ -6,15 +6,16 @@ import 'package:vesta_app/features/auth/login_screen.dart';
 import 'package:vesta_app/features/auth/register_screen.dart';
 import 'package:vesta_app/screens/alerts_screen.dart';
 import 'package:vesta_app/screens/add_child_screen.dart';
-import 'package:vesta_app/screens/crear_hijo_screen.dart';
 import 'package:vesta_app/screens/dashboard_screen.dart';
 import 'package:vesta_app/screens/filters_screen.dart';
 import 'package:vesta_app/screens/home_screen.dart';
 import 'package:vesta_app/screens/reports_screen.dart';
 import 'package:vesta_app/screens/privacy_consent_screen.dart';
+import 'package:vesta_app/screens/settings_screen.dart';
 import 'package:vesta_app/widgets/link_access_gate.dart';
 import 'package:vesta_app/widgets/privacy_access_gate.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class AppRouter {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -24,12 +25,23 @@ class AppRouter {
     );
   }
 
+  /// Main dashboard: reachable when there are profiles even if they are not
+  /// linked, so their QR can be shown, edited or another one added.
+  Widget _dashboard() {
+    return const PrivacyAccessGate(
+      child: LinkAccessGate(
+        allowUnlinkedChildren: true,
+        child: DashboardScreen(),
+      ),
+    );
+  }
+
   late final GoRouter router = GoRouter(
     initialLocation: '/login',
     refreshListenable: GoRouterRefreshStream(auth.authStateChanges()),
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Vesta')),
-      body: const Center(child: Text('La pantalla solicitada no existe.')),
+      body: Center(child: Text(tr('La pantalla solicitada no existe.'))),
     ),
     redirect: (context, state) {
       final user = auth.currentUser;
@@ -50,13 +62,13 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => _protected(const DashboardScreen()),
+        builder: (context, state) => _dashboard(),
       ),
-      // Alias explícito para evitar que navegaciones antiguas terminen
-      // en el errorBuilder y se salten la comprobación de vinculación.
+      // Explicit alias so old navigations don't end up in the errorBuilder
+      // and skip the linking check.
       GoRoute(
         path: '/dashboard',
-        builder: (context, state) => _protected(const DashboardScreen()),
+        builder: (context, state) => _dashboard(),
       ),
       GoRoute(
         path: '/login',
@@ -71,6 +83,10 @@ class AppRouter {
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
         path: '/privacy',
         builder: (context, state) => const PrivacyConsentScreen(),
       ),
@@ -79,18 +95,10 @@ class AppRouter {
         builder: (context, state) => PrivacyAccessGate(
           child: LinkAccessGate(
             allowWhenNoChildren: true,
+            allowUnlinkedChildren: true,
             child: AddChildScreen(
               childData: state.extra as Map<String, dynamic>?,
             ),
-          ),
-        ),
-      ),
-      GoRoute(
-        path: '/crear-hijo',
-        builder: (context, state) => PrivacyAccessGate(
-          child: LinkAccessGate(
-            allowWhenNoChildren: true,
-            child: const CrearHijoScreen(),
           ),
         ),
       ),
@@ -104,14 +112,18 @@ class AppRouter {
 
           final extra = state.extra;
           final childName = extra is Map<String, dynamic>
-              ? (extra['childName'] ?? 'Menor').toString()
-              : (extra as String? ?? 'Menor');
+              ? (extra['childName'] ?? tr('Menor')).toString()
+              : (extra is String ? extra : tr('Menor'));
 
           return _protected(
             HomeScreen(
               childId: childId,
               childName: childName,
               tutorId: auth.currentUser?.uid ?? '',
+              initialTab: HomeScreen.tabFromName(
+                state.uri.queryParameters['tab'],
+              ),
+              openRequests: state.uri.queryParameters['open'] == 'requests',
             ),
           );
         },

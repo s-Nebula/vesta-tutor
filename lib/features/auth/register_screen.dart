@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vesta_app/services/auth_service.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -42,14 +43,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (email.isEmpty || !email.contains('@')) {
       setState(() {
-        _errorMessage = 'Por favor, introduce un correo electrónico válido.';
+        _errorMessage = tr('Por favor, introduce un correo electrónico válido.');
       });
       return;
     }
 
     if (password.length < 6) {
       setState(() {
-        _errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+        _errorMessage = tr('La contraseña debe tener al menos 6 caracteres.');
       });
       return;
     }
@@ -104,7 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Icons.arrow_back_rounded,
                           size: 18,
                         ),
-                        label: const Text('Iniciar sesión'),
+                        label: Text(tr('Iniciar sesión')),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white70,
                         ),
@@ -136,8 +137,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Únete a VESTA',
+                    Text(
+                      tr('Únete a VESTA'),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 27,
@@ -146,8 +147,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Crea tu cuenta y comienza a proteger',
+                    Text(
+                      tr('Crea tu cuenta y comienza a proteger'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white70,
@@ -174,8 +175,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            'Crear cuenta',
+                          Text(
+                            tr('Crear cuenta'),
                             style: TextStyle(
                               color: _dark,
                               fontSize: 21,
@@ -183,8 +184,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            'Completa tus datos para registrarte.',
+                          Text(
+                            tr('Completa tus datos para registrarte.'),
                             style: TextStyle(
                               color: _muted,
                               fontSize: 12,
@@ -192,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 25),
                           _buildInputField(
-                            label: 'Correo electrónico',
+                            label: tr('Correo electrónico'),
                             hint: 'nombre@ejemplo.com',
                             controller: emailController,
                             icon: Icons.email_outlined,
@@ -200,8 +201,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 17),
                           _buildInputField(
-                            label: 'Contraseña',
-                            hint: 'Mínimo 6 caracteres',
+                            label: tr('Contraseña'),
+                            hint: tr('Mínimo 6 caracteres'),
                             controller: passwordController,
                             icon: Icons.lock_outline_rounded,
                             obscureText: _obscurePassword,
@@ -222,15 +223,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 17),
                           _buildInputField(
-                            label: 'Nombre de usuario',
-                            hint: 'Tu nombre',
+                            label: tr('Nombre de usuario'),
+                            hint: tr('Tu nombre'),
                             controller: usernameController,
                             icon: Icons.person_outline_rounded,
                           ),
                           const SizedBox(height: 17),
                           _buildInputField(
-                            label: 'País / región',
-                            hint: 'Tu ubicación',
+                            label: tr('País / región'),
+                            hint: tr('Tu ubicación'),
                             controller: countryController,
                             icon: Icons.public_rounded,
                           ),
@@ -307,7 +308,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Row(
+                                    : Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
@@ -318,7 +319,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           ),
                                           SizedBox(width: 10),
                                           Text(
-                                            'Crear mi cuenta',
+                                            tr('Crear mi cuenta'),
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w700,
@@ -334,11 +335,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
-                      'VESTA · Seguridad y tranquilidad',
+                    Text(
+                      tr('VESTA · Seguridad y tranquilidad'),
                       style: TextStyle(
                         color: Colors.white60,
-                        fontSize: 11,
+                        fontSize: 12,
                         letterSpacing: 0.7,
                       ),
                     ),

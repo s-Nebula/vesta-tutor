@@ -4,11 +4,11 @@ Política de tratamiento de datos personales y privacidad
 
 Cómo FORBIDDEN S.A.S. recolecta, usa, protege y conserva los datos personales tratados mediante Vesta, conforme a la Ley 1581 de 2012.
 
-Versión | 1.0
+Versión | 1.1
 
-Fecha de entrada en vigor | 20 de noviembre de 2026
+Fecha de entrada en vigor | 22 de noviembre de 2026
 
-Última actualización | 20 de noviembre de 2026
+Última actualización | 22 de noviembre de 2026
 
 Responsable del tratamiento | FORBIDDEN S.A.S. — NIT 901653270-2
 
@@ -18,7 +18,7 @@ Jurisdicción | República de Colombia
 
 FORBIDDEN S.A.S.
 
-NIT 901653270-2 · Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia
+NIT 901653270-2 · Santa Marta, Magdalena, Colombia
 
 nebulagnu@proton.me · +57 324 616 7956
 
@@ -77,7 +77,6 @@ NIT: 901653270-2
 Matrícula mercantil: 262746
 Cámara de Comercio: Santa Marta para el Magdalena
 Domicilio: Santa Marta, Magdalena, Colombia.
-Dirección física: Cra. 66 # 46a - 128.
 Correo para privacidad y solicitudes: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 Área responsable de atender consultas y reclamos: Protección de Datos Personales de FORBIDDEN S.A.S., a través del correo nebulagnu@proton.me.
@@ -179,6 +178,10 @@ Fecha de creación de cuenta.
 
 Información técnica necesaria para mantener la sesión.
 
+Identificador para el envío de notificaciones al dispositivo del administrador.
+
+Preferencias de notificación, como recibir al instante solo las alertas críticas o el resumen semanal.
+
 Las credenciales de autenticación son gestionadas por el proveedor de identidad correspondiente. Vesta no necesita almacenar la contraseña en texto plano.
 
 5.2. Datos del perfil del menor
@@ -197,6 +200,8 @@ Estado de vinculación.
 
 Fecha de creación y vinculación.
 
+Código de vinculación vigente y su fecha de caducidad.
+
 Se recomienda utilizar únicamente la información necesaria para identificar el perfil dentro del servicio.
 
 5.3. Datos de ubicación
@@ -209,7 +214,9 @@ Longitud.
 
 Velocidad estimada.
 
-Fecha y hora de la medición.
+Precisión estimada de la medición.
+
+Fecha y hora de la medición en el dispositivo y fecha de recepción en el servidor.
 
 Estado de actividad del dispositivo.
 
@@ -218,6 +225,8 @@ Información técnica necesaria para interpretar la ubicación.
 Los datos se utilizan para mostrar la ubicación del dispositivo y conservar el historial autorizado.
 
 La frecuencia de captura depende de las condiciones del dispositivo, Android, GPS, batería y conectividad. No se garantiza una frecuencia exacta ni disponibilidad permanente.
+
+Si el dispositivo no tiene conexión, Vesta Tracker puede guardar las mediciones temporalmente en el propio dispositivo y enviarlas cuando se recupere la conexión. La fecha de la medición permite mostrarlas en el orden correcto.
 
 5.4. Información de estado del dispositivo
 
@@ -260,6 +269,8 @@ Fecha del informe.
 Los informes se generan de manera periódica y pueden limitarse a un número máximo de aplicaciones por informe.
 
 Vesta no utiliza esta función para registrar el contenido de mensajes, contraseñas o comunicaciones privadas.
+
+Cuando el administrador configura límites de tiempo diarios, Vesta Tracker calcula en el propio dispositivo el tiempo de uso del día de las aplicaciones limitadas para decidir si deben bloquearse.
 
 5.6. Datos relacionados con accesibilidad y bloqueos
 
@@ -323,9 +334,101 @@ Aplicación o dominio asociado.
 
 Datos técnicos necesarios para identificar el evento.
 
-Pueden generarse alertas por batería, velocidad y bloqueos, de acuerdo con las funciones habilitadas.
+Pueden generarse alertas por batería, velocidad, bloqueos, zonas seguras, botón SOS, modo estudio, límites de tiempo, pérdida de conexión y desactivación de las protecciones, de acuerdo con las funciones habilitadas.
 
-5.9. Datos técnicos y de soporte
+5.9. Zonas seguras
+
+El administrador puede definir zonas seguras (por ejemplo, la casa o el colegio). Para cada zona se trata:
+
+Nombre de la zona.
+
+Coordenadas del centro y radio.
+
+Preferencias de aviso de llegada y salida.
+
+Vesta Tracker compara su ubicación con estas zonas en el propio dispositivo. Cuando detecta una llegada o una salida, genera una alerta con el nombre de la zona, la fecha y hora y la ubicación en ese momento.
+
+Esta función forma parte de la finalidad de ubicación y solo opera cuando esa finalidad está autorizada.
+
+5.10. Botón de emergencia (SOS)
+
+Cuando el menor mantiene pulsado el botón SOS de Vesta Tracker, se envía a los administradores una alerta crítica que puede incluir:
+
+Fecha y hora del aviso.
+
+Ubicación del dispositivo y su precisión, solo si la finalidad de ubicación está autorizada.
+
+Indicación de que se usó la última ubicación conocida, cuando no fue posible obtener una nueva.
+
+El aviso requiere que la finalidad de alertas esté autorizada. Si no hay conexión, se envía cuando se recupere.
+
+5.11. Solicitudes del menor
+
+Desde Vesta Tracker, el menor puede pedir al administrador permiso para usar una aplicación o más tiempo. Cada solicitud contiene:
+
+Tipo de solicitud.
+
+Nombre e identificador de la aplicación.
+
+Tiempo solicitado.
+
+Mensaje opcional escrito por el menor, de hasta 200 caracteres.
+
+Estado de la solicitud, respuesta del administrador, tiempo concedido y fecha.
+
+Si el administrador la aprueba, la aplicación queda permitida durante el tiempo concedido. Se recomienda al menor no incluir en el mensaje datos personales innecesarios.
+
+5.12. Modo estudio y límites de tiempo
+
+Para aplicar el modo estudio y los límites de tiempo diarios se trata:
+
+Horarios y estado del modo estudio.
+
+Aplicaciones permitidas durante el modo estudio.
+
+Límite diario configurado para cada aplicación.
+
+Intentos de abrir aplicaciones no permitidas durante el modo estudio y avisos de tiempo agotado.
+
+Estas funciones forman parte de la finalidad de control de aplicaciones.
+
+5.13. Búsqueda segura y DNS cifrado
+
+Cuando el administrador activa la búsqueda segura, la VPN local de Vesta Tracker responde a las consultas de los buscadores compatibles (Google, Bing, DuckDuckGo y YouTube) con las direcciones de sus versiones con filtrado de contenido. También bloquea la resolución de proveedores conocidos de DNS cifrado, para que el filtrado no pueda evitarse desde el navegador.
+
+Este proceso ocurre en el dispositivo. No se guarda el historial de búsquedas ni de navegación, y estas consultas no generan alertas.
+
+5.14. Avisos de protección y de conexión
+
+Para informar al administrador de situaciones que afectan a la protección, Vesta puede registrar:
+
+Desactivación del servicio de accesibilidad o de la VPN local.
+
+Desactivación de la ubicación del dispositivo o retirada del permiso de ubicación.
+
+Periodos en los que el dispositivo estuvo sin conexión y su duración.
+
+Falta de comunicación prolongada, detectada por el servidor a partir de la fecha de la última actualización recibida.
+
+5.15. Resúmenes semanales
+
+Cada semana, el servidor elabora un resumen a partir de datos ya recopilados, que puede incluir:
+
+Número de alertas por tipo.
+
+Tiempo medio diario de pantalla.
+
+Aplicaciones más utilizadas y su tiempo de uso.
+
+Los datos de uso solo se incluyen si la finalidad de estadísticas de uso está autorizada. El administrador puede desactivar el envío del resumen.
+
+5.16. Vinculación mediante código QR
+
+El código QR contiene únicamente el código de vinculación, que caduca a las 24 horas.
+
+Vesta Tracker utiliza la cámara solo para leer el código QR. Las imágenes no se almacenan ni se transmiten.
+
+5.17. Datos técnicos y de soporte
 
 Cuando el usuario solicita soporte, Vesta podrá tratar:
 
@@ -364,6 +467,22 @@ Aplicar reglas de bloqueo.
 Procesar consultas DNS para filtrado de dominios.
 
 Generar y mostrar alertas.
+
+Avisar de llegadas y salidas de las zonas seguras.
+
+Transmitir los avisos de emergencia (SOS) a los administradores.
+
+Aplicar el modo estudio y los límites de tiempo diarios.
+
+Gestionar las solicitudes del menor y los permisos temporales concedidos.
+
+Aplicar la búsqueda segura e impedir que el filtrado se evite mediante DNS cifrado.
+
+Detectar la desactivación de las protecciones y la pérdida prolongada de conexión.
+
+Elaborar resúmenes semanales.
+
+Enviar notificaciones según las preferencias del administrador.
 
 Diagnosticar errores.
 
@@ -405,6 +524,8 @@ La autorización no debe utilizarse para justificar vigilancia desproporcionada,
 
 El menor podrá solicitar información sobre el funcionamiento de la supervisión y expresar su opinión mediante los canales disponibles.
 
+Vesta Tracker incluye la sección «Qué comparte Vesta», que explica al menor en lenguaje sencillo qué información se comparte, qué no se comparte y qué funciones están activas. Desde Vesta Tracker el menor también puede enviar solicitudes al administrador.
+
 8. Autorización y consentimiento
 
 Antes de iniciar la recopilación de datos personales, Vesta informa al titular o a su representante legal sobre:
@@ -426,6 +547,20 @@ La autorización se conserva de forma que pueda ser consultada y demostrada post
 La autorización para el tratamiento de datos personales es independiente de los permisos técnicos de Android. Conceder un permiso del sistema operativo no sustituye la autorización legal para el tratamiento de datos.
 
 Cuando se active una nueva función que implique una finalidad o categoría de datos adicional, Vesta informará al usuario y solicitará la autorización correspondiente cuando sea necesaria.
+
+La autorización se otorga por finalidades. Cada función solo opera si todos los representantes legales vinculados al perfil autorizaron la finalidad correspondiente:
+
+Ubicación: ubicación, historial, zonas seguras y ubicación del aviso SOS.
+
+Estado del dispositivo: batería, conectividad y avisos de pérdida de conexión.
+
+Estadísticas de uso: informes de uso y datos de uso del resumen semanal.
+
+Control de aplicaciones: bloqueo de aplicaciones, modo estudio, límites de tiempo y solicitudes del menor.
+
+Filtrado de dominios: bloqueo de dominios, búsqueda segura y bloqueo de DNS cifrado.
+
+Alertas: envío de alertas, avisos SOS y resumen semanal.
 
 9. Datos sensibles
 
@@ -449,6 +584,12 @@ Infraestructura de API: procesamiento de operaciones de vinculación y comunicac
 
 Proveedores de infraestructura y conectividad: alojamiento, disponibilidad, seguridad y operación técnica.
 
+Firebase Cloud Messaging: envío de notificaciones a los dispositivos de los administradores.
+
+OpenStreetMap: mapas mostrados en Vesta Padre. Al cargar el mapa, el dispositivo del administrador solicita imágenes de la zona consultada a los servidores de OpenStreetMap.
+
+Google Maps: solo cuando el administrador elige abrir una ubicación o una ruta en esa aplicación.
+
 Los proveedores actúan según las funciones y responsabilidades que correspondan a cada servicio.
 
 FORBIDDEN S.A.S. mantiene un inventario actualizado de proveedores, sus funciones, condiciones contractuales, ubicaciones de tratamiento y garantías aplicables.
@@ -466,6 +607,10 @@ Autenticación de usuarios y dispositivos.
 Control de acceso por roles.
 
 Reglas de autorización en las bases de datos.
+
+Caducidad de los códigos de vinculación a las 24 horas.
+
+Exclusión de los datos locales de las aplicaciones de las copias de seguridad automáticas del dispositivo.
 
 Comunicaciones cifradas cuando corresponda.
 
@@ -512,7 +657,6 @@ Los derechos de los menores podrán ser ejercidos por las personas legalmente fa
 Las solicitudes podrán presentarse mediante:
 
 Correo: nebulagnu@proton.me
-Dirección: Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia.
 Teléfono: +57 324 616 7956.
 
 13.1. Consultas
@@ -563,9 +707,17 @@ Informes de uso | 90 días
 
 Alertas | 12 meses
 
+Solicitudes del menor | 90 días
+
+Resúmenes semanales | 12 meses
+
 Estado del dispositivo | 90 días desde la última actualización
 
 Reglas de protección | Mientras estén activas y hasta 30 días después de su eliminación
+
+Zonas seguras, modo estudio y límites de tiempo | Mientras estén configurados y hasta 30 días después de su eliminación
+
+Datos pendientes de envío en el dispositivo | Hasta su envío al servidor o hasta la desvinculación del dispositivo
 
 Registros de seguridad | 12 meses, salvo necesidad justificada de conservación
 
@@ -600,6 +752,10 @@ Eliminar informes de uso.
 Eliminar alertas.
 
 Eliminar reglas de protección.
+
+Eliminar zonas seguras, configuración del modo estudio y límites de tiempo.
+
+Eliminar solicitudes del menor y resúmenes semanales.
 
 Eliminar asociaciones de dispositivos.
 
@@ -671,6 +827,8 @@ Cuando un cambio implique una nueva finalidad o un tratamiento que requiera auto
 
 La fecha de actualización será indicada en el encabezado del documento.
 
+La versión 1.1 incorpora las categorías de datos y finalidades de las zonas seguras, el botón SOS, las solicitudes del menor, el modo estudio, los límites de tiempo, la búsqueda segura, el bloqueo de DNS cifrado, los avisos de protección y conexión, los resúmenes semanales y la vinculación por código QR. Por tratarse de finalidades nuevas, se solicita una nueva autorización.
+
 21. Autoridad de protección de datos
 
 En Colombia, la Superintendencia de Industria y Comercio (SIC) ejerce funciones de vigilancia sobre el cumplimiento del régimen general de protección de datos personales.
@@ -685,10 +843,9 @@ FORBIDDEN S.A.S.
 NIT: 901653270-2
 Proyecto: Vesta Security
 Domicilio: Santa Marta, Magdalena, Colombia.
-Dirección: Cra. 66 # 46a - 128.
 Correo: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 
-© 2026 Vesta Security. FORBIDDEN S.A.S. Todos los derechos reservados, sin perjuicio de las licencias de software de código abierto aplicables.
+© 2026 Vesta Security. FORBIDDEN S.A.S. Todos los derechos reservados.
 
-© 2026 Vesta Security · FORBIDDEN S.A.S.. Documento oficial, versión 1.0. La versión vigente se publica en las aplicaciones y en el sitio web de Vesta.
+© 2026 Vesta Security · FORBIDDEN S.A.S.. Documento oficial, versión 1.1. La versión vigente se publica en las aplicaciones y en el sitio web de Vesta.

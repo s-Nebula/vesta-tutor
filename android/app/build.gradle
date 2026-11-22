@@ -16,7 +16,13 @@ def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "
 def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file("key.properties")
+// La clave de firma y sus contraseñas viven fuera del proyecto
+// (vesta-build/secrets/signing) para que nunca acaben en el repositorio.
+// Se puede indicar otra ruta con la variable VESTA_KEY_PROPERTIES.
+def keystorePropertiesFile = file(
+    System.getenv("VESTA_KEY_PROPERTIES") ?:
+        "${rootProject.projectDir}/../../../secrets/signing/key.properties"
+)
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -47,10 +53,12 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(keystoreProperties["storeFile"])
-            storePassword keystoreProperties["storePassword"]
-            keyAlias keystoreProperties["keyAlias"]
-            keyPassword keystoreProperties["keyPassword"]
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+            }
         }
     }
     buildTypes {

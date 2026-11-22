@@ -1,37 +1,68 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vesta_app/services/auth_service.dart';
+import 'package:vesta_app/theme/vesta_theme.dart';
+import 'package:vesta_app/widgets/pairing_card.dart';
 
-class LinkAccessGate extends StatelessWidget {
+import 'package:vesta_app/l10n/tr.dart';
+/// Requires the guardian to have at least one profile (and, by default, at
+/// least one linked device) before showing [child].
+class LinkAccessGate extends StatefulWidget {
   final Widget child;
+
+  /// Allows access when no profile exists yet (sign-up).
   final bool allowWhenNoChildren;
+
+  /// Allows access when there are profiles even if none is linked
+  /// (main dashboard: from there profiles are edited, the QR shown or another added).
+  final bool allowUnlinkedChildren;
 
   const LinkAccessGate({
     super.key,
     required this.child,
     this.allowWhenNoChildren = false,
+    this.allowUnlinkedChildren = false,
   });
+
+  @override
+  State<LinkAccessGate> createState() => _LinkAccessGateState();
+}
+
+class _LinkAccessGateState extends State<LinkAccessGate> {
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _stream;
+  String? _uid;
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> _streamFor(String uid) {
+    // Created once: a new Firestore subscription used to be opened on every
+    // widget rebuild.
+    if (_stream == null || _uid != uid) {
+      _uid = uid;
+      _stream = FirebaseFirestore.instance
+          .collection('children')
+          .where('parentIds', arrayContains: uid)
+          .snapshots();
+    }
+    return _stream!;
+  }
+
+  void _retry() => setState(() => _stream = null);
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null || user.isAnonymous) {
-      return const Scaffold(
-        body: Center(child: Text('Inicia sesión para continuar.')),
+      return Scaffold(
+        body: Center(child: Text(tr('Inicia sesión para continuar.'))),
       );
     }
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('children')
-          .where('parentIds', arrayContains: user.uid)
-          .snapshots(),
+      stream: _streamFor(user.uid),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.hasError && !snapshot.hasData) {
           return Scaffold(
             body: Center(
               child: Padding(
@@ -41,18 +72,14 @@ class LinkAccessGate extends StatelessWidget {
                   children: [
                     const Icon(Icons.cloud_off, size: 48),
                     const SizedBox(height: 16),
-                    const Text(
-                      'No se pudo comprobar la vinculación. '
-                      'Revisa tu conexión e inténtalo de nuevo.',
+                    Text(
+                      tr('No se pudo comprobar la vinculación. Revisa tu conexión e inténtalo de nuevo.'),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () {
-                        // StreamBuilder volverá a suscribirse al reconstruirse.
-                        (context as Element).markNeedsBuild();
-                      },
-                      child: const Text('Reintentar'),
+                      onPressed: _retry,
+                      child: Text(tr('Reintentar')),
                     ),
                   ],
                 ),
@@ -61,24 +88,25 @@ class LinkAccessGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const Scaffold(
-            backgroundColor: Color(0xFF1A1D24),
+        if (!snapshot.hasData) {
+          return Scaffold(
+            backgroundColor: VestaTheme.background,
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFFE03131)),
+              child: CircularProgressIndicator(color: VestaTheme.rose),
             ),
           );
         }
 
-        final children = snapshot.data?.docs ?? [];
+        final children = snapshot.data!.docs;
         final hasLinkedDevice = children.any(
           (doc) => doc.data()['status'] == 'vinculado',
         );
 
-        if (hasLinkedDevice) return child;
-
-        if (children.isEmpty && allowWhenNoChildren) return child;
+        if (hasLinkedDevice) return widget.child;
+        if (children.isEmpty && widget.allowWhenNoChildren) return widget.child;
+        if (children.isNotEmpty && widget.allowUnlinkedChildren) {
+          return widget.child;
+        }
 
         return _PairingRequiredScreen(children: children);
       },
@@ -96,18 +124,23 @@ class _PairingRequiredScreen extends StatelessWidget {
     final hasChildren = children.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1D24),
+      backgroundColor: VestaTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111318),
         title: const Text(
           'VESTA',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2),
         ),
         actions: [
+          if (hasChildren)
+            IconButton(
+              tooltip: tr('Ir al panel'),
+              onPressed: () => context.go('/'),
+              icon: const Icon(Icons.dashboard_rounded),
+            ),
           IconButton(
-            tooltip: 'Cerrar sesión',
+            tooltip: tr('Cerrar sesión'),
             onPressed: () => AuthService().signOut(),
-            icon: const Icon(Icons.logout, color: Colors.white70),
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
@@ -122,115 +155,57 @@ class _PairingRequiredScreen extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.phonelink_lock,
-                    color: Color(0xFFE03131),
-                    size: 68,
+                    color: VestaTheme.rose,
+                    size: 64,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   Text(
                     hasChildren
-                        ? 'Vincula el dispositivo de tu hijo'
-                        : 'Antes de continuar, registra a tu hijo',
+                        ? tr('Vincula el dispositivo de tu hijo')
+                        : tr('Antes de continuar, registra a tu hijo'),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: VestaTheme.textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Text(
                     hasChildren
-                        ? 'Introduce uno de los siguientes códigos en Vesta Tracker. '
-                            'El panel se habilitará automáticamente cuando se complete la vinculación.'
-                        : 'Para habilitar el panel de control primero debes crear un perfil '
-                            'y vincular el dispositivo con Vesta Tracker.',
+                        ? tr('Instala Vesta Tracker en su teléfono y escanea el código QR. Esta pantalla se actualizará sola cuando termine la vinculación.')
+                        : tr('Para habilitar el panel de control primero debes crear un perfil y vincular el dispositivo con Vesta Tracker.'),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    style: TextStyle(
+                      color: VestaTheme.textSecondary,
                       height: 1.5,
                     ),
                   ),
-                  if (hasChildren) ...[
-                    const SizedBox(height: 28),
+                  const SizedBox(height: 24),
+                  if (hasChildren)
                     ...children.map((doc) {
                       final data = doc.data();
-                      final name = data['nombre']?.toString() ?? 'Menor';
-                      final code = data['pairingCode']?.toString() ?? '';
-
-                      return Card(
-                        color: const Color(0xFF242831),
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Código de vinculación',
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                              const SizedBox(height: 8),
-                              SelectableText(
-                                code.isEmpty ? 'Código no disponible' : code,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.amber,
-                                  fontSize: 25,
-                                  letterSpacing: 3,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (code.isNotEmpty)
-                                TextButton.icon(
-                                  onPressed: () async {
-                                    await Clipboard.setData(
-                                      ClipboardData(text: code),
-                                    );
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Código copiado.'),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: const Icon(Icons.copy),
-                                  label: const Text('Copiar código'),
-                                ),
-                            ],
-                          ),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: PairingCard(
+                          childId: doc.id,
+                          childName: data['nombre']?.toString() ?? tr('Menor'),
+                          pairingCode: data['pairingCode']?.toString() ?? '',
+                          expiresAt: pairingExpiryOf(data),
                         ),
                       );
-                    }),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Mantén esta pantalla abierta. Detectaremos la vinculación automáticamente.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white60),
-                    ),
-                  ] else ...[
-                    const SizedBox(height: 28),
+                    })
+                  else
                     ElevatedButton.icon(
                       onPressed: () => context.go('/add-child'),
                       icon: const Icon(Icons.add),
-                      label: const Text('Registrar menor'),
+                      label: Text(tr('Registrar menor')),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE03131),
+                        backgroundColor: VestaTheme.rose,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                     ),
-                  ],
                 ],
               ),
             ),

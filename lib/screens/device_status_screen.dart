@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vesta_app/services/notification_service.dart';
+import 'package:vesta_app/theme/vesta_theme.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class DeviceStatusScreen extends StatefulWidget {
   final String childId;
 
@@ -18,17 +19,13 @@ class DeviceStatusScreen extends StatefulWidget {
 class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
   static const Color _wine = Color(0xFF792D43);
   static const Color _rose = Color(0xFFC15B68);
-  static const Color _ivory = Color(0xFFF4EDEA);
+  static Color get _ivory => VestaTheme.textPrimary;
   static const Color _dark = Color(0xFF211B20);
   static const Color _muted = Color(0xFF8D7D82);
   static const Duration _offlineThreshold = Duration(minutes: 12);
 
-  final NotificationService _notificationService = NotificationService();
-
   Timer? _clockTimer;
   DateTime _now = DateTime.now();
-  bool? _lastCommunicationState;
-  bool _notificationPending = false;
 
   @override
   void initState() {
@@ -55,7 +52,7 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
 
   String _lastUpdate(dynamic value) {
     final date = _parseLastUpdate(value);
-    if (date == null) return 'Sin información';
+    if (date == null) return tr('Sin información');
 
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -65,70 +62,34 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
     return '$day/$month/${date.year} · $hour:$minute';
   }
 
-  void _evaluateCommunication(bool offline) {
-    if (_lastCommunicationState == offline || _notificationPending) {
-      return;
-    }
-
-    _notificationPending = true;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _notificationPending = false;
-
-      if (!mounted || _lastCommunicationState == offline) return;
-
-      final previousState = _lastCommunicationState;
-      _lastCommunicationState = offline;
-
-      if (offline) {
-        await _notificationService.mostrarNotificacionInmediata(
-          titulo: 'Dispositivo sin comunicación',
-          subtitulo:
-              'Vesta Tracker no envía actualizaciones desde hace más de 12 minutos.',
-          tipo: 'critical',
-        );
-      } else if (previousState == true) {
-        await _notificationService.mostrarNotificacionInmediata(
-          titulo: 'Comunicación recuperada',
-          subtitulo: 'Vesta Tracker volvió a enviar información.',
-          tipo: 'warning',
-        );
-      }
-    });
-  }
+  // Created once. It used to be created in build() and the 30 s timer
+  // reopened the subscription, showing the loading indicator every time.
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>> statusStream =
+      FirebaseFirestore.instance
+          .collection('children')
+          .doc(widget.childId)
+          .collection('device_status')
+          .doc('current')
+          .snapshots();
 
   @override
   Widget build(BuildContext context) {
-    final statusStream = FirebaseFirestore.instance
-        .collection('children')
-        .doc(widget.childId)
-        .collection('device_status')
-        .doc('current')
-        .snapshots();
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF211B20),
-            Color(0xFF421827),
-            Color(0xFF30232B),
-          ],
-        ),
+      decoration: BoxDecoration(
+        gradient: VestaTheme.screenGradient,
       ),
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: statusStream,
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
+          if (snapshot.hasError && !snapshot.hasData) {
             return _messageState(
               Icons.cloud_off_rounded,
-              'No se pudo cargar la información del dispositivo.',
+              tr('No se pudo cargar la información del dispositivo.'),
             );
           }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(color: _rose),
             );
@@ -137,7 +98,7 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return _messageState(
               Icons.phone_android_rounded,
-              'Esperando información del dispositivo Tracker...',
+              tr('Esperando información del dispositivo Tracker...'),
             );
           }
 
@@ -150,7 +111,7 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
           final offline = lastUpdate != null &&
               _now.difference(lastUpdate) > _offlineThreshold;
 
-          _evaluateCommunication(offline);
+          // The server reports disconnection (device_offline alert).
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 25),
@@ -161,8 +122,8 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
               const SizedBox(height: 14),
               _batteryCard(level, charging),
               const SizedBox(height: 23),
-              const Text(
-                'INFORMACIÓN DEL EQUIPO',
+              Text(
+                tr('INFORMACIÓN DEL EQUIPO'),
                 style: TextStyle(
                   color: _ivory,
                   fontSize: 12,
@@ -173,39 +134,39 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
               const SizedBox(height: 12),
               _infoCard(
                 Icons.phone_android_rounded,
-                'Fabricante',
-                data['manufacturer']?.toString() ?? 'Sin información',
+                tr('Fabricante'),
+                data['manufacturer']?.toString() ?? tr('Sin información'),
               ),
               _infoCard(
                 Icons.devices_rounded,
-                'Modelo',
-                data['model']?.toString() ?? 'Sin información',
+                tr('Modelo'),
+                data['model']?.toString() ?? tr('Sin información'),
               ),
               _infoCard(
                 Icons.branding_watermark_rounded,
-                'Marca',
-                data['brand']?.toString() ?? 'Sin información',
+                tr('Marca'),
+                data['brand']?.toString() ?? tr('Sin información'),
               ),
               _infoCard(
                 Icons.android_rounded,
-                'Versión de Android',
+                tr('Versión de Android'),
                 data['androidVersion'] == null
-                    ? 'Sin información'
-                    : '${data['androidVersion']} (SDK ${data['androidSdk'] ?? '?'})',
+                    ? tr('Sin información')
+                    : tr('{0} (SDK {1})', [data['androidVersion'], data['androidSdk'] ?? '?']),
               ),
               _infoCard(
                 Icons.wifi_rounded,
-                'Conectividad',
-                data['connectivity']?.toString() ?? 'Sin información',
+                tr('Conectividad'),
+                data['connectivity']?.toString() ?? tr('Sin información'),
               ),
               _infoCard(
                 Icons.battery_charging_full_rounded,
-                'Estado de batería',
-                data['batteryState']?.toString() ?? 'Sin información',
+                tr('Estado de batería'),
+                data['batteryState']?.toString() ?? tr('Sin información'),
               ),
               _infoCard(
                 Icons.access_time_rounded,
-                'Última comunicación',
+                tr('Última comunicación'),
                 _lastUpdate(data['updatedAt']),
               ),
               const SizedBox(height: 14),
@@ -229,11 +190,11 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        'La información se actualiza mientras Vesta Tracker permanece activo.',
+                        tr('La información se actualiza mientras Vesta Tracker permanece activo.'),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _ivory.withValues(alpha: 0.65),
-                          fontSize: 11,
+                          fontSize: 12,
                           height: 1.5,
                         ),
                       ),
@@ -301,12 +262,12 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
           ),
         ),
         const SizedBox(width: 13),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Estado del dispositivo',
+                tr('Estado del dispositivo'),
                 style: TextStyle(
                   color: _ivory,
                   fontSize: 19,
@@ -315,9 +276,9 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
               ),
               SizedBox(height: 3),
               Text(
-                'Supervisión de Vesta Tracker',
+                tr('Supervisión de Vesta Tracker'),
                 style: TextStyle(
-                  color: Color(0xFFD6B7A6),
+                  color: VestaTheme.textSecondary,
                   fontSize: 12,
                 ),
               ),
@@ -334,12 +295,12 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
         : const Color(0xFF559B79);
 
     final title = offline
-        ? 'SIN COMUNICACIÓN'
-        : 'DISPOSITIVO CONECTADO';
+        ? tr('SIN COMUNICACIÓN')
+        : tr('DISPOSITIVO CONECTADO');
 
     final subtitle = offline
-        ? 'No se reciben actualizaciones desde hace más de 12 minutos.'
-        : 'Se están recibiendo actualizaciones del dispositivo.';
+        ? tr('No se reciben actualizaciones desde hace más de 12 minutos.')
+        : tr('Se están recibiendo actualizaciones del dispositivo.');
 
     return Container(
       padding: const EdgeInsets.all(19),
@@ -398,10 +359,10 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
                 if (lastUpdate != null) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'Último contacto: ${_lastUpdate(lastUpdate)}',
+                    tr('Último contacto: {0}', [_lastUpdate(lastUpdate)]),
                     style: const TextStyle(
                       color: _muted,
-                      fontSize: 10,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -429,7 +390,7 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
     return Container(
       padding: const EdgeInsets.all(19),
       decoration: BoxDecoration(
-        color: const Color(0xFF30232B),
+        color: VestaTheme.surface,
         borderRadius: BorderRadius.circular(23),
         border: Border.all(
           color: _rose.withValues(alpha: 0.2),
@@ -448,9 +409,9 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
                 size: 31,
               ),
               const SizedBox(width: 11),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Batería',
+                  tr('Batería'),
                   style: TextStyle(
                     color: _ivory,
                     fontSize: 14,
@@ -490,10 +451,10 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
               ),
               const SizedBox(width: 7),
               Text(
-                charging ? 'Conectado al cargador' : 'No está cargando',
+                charging ? tr('Conectado al cargador') : tr('No está cargando'),
                 style: TextStyle(
                   color: _ivory.withValues(alpha: 0.7),
-                  fontSize: 11,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -534,7 +495,7 @@ class _DeviceStatusScreenState extends State<DeviceStatusScreen> {
                   title,
                   style: const TextStyle(
                     color: _muted,
-                    fontSize: 11,
+                    fontSize: 12,
                   ),
                 ),
                 const SizedBox(height: 4),

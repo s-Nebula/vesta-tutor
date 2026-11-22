@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:vesta_app/theme/vesta_theme.dart';
+import 'package:vesta_app/widgets/weekly_summary_card.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class ReportsScreen extends StatefulWidget {
   final String childId;
   final String tutorId;
@@ -25,10 +27,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
   bool _weekly = true;
   bool _exporting = false;
 
-  static const Color _background = Color(0xFF211B20);
-  static const Color _card = Color(0xFF30232B);
-  static const Color _accent = Color(0xFFC15B68);
-  static const Color _muted = Color(0xFFD6B7A6);
+  static Color get _background => VestaTheme.background;
+  static Color get _card => VestaTheme.surface;
+  static const Color _accent = VestaTheme.rose;
+  static Color get _muted => VestaTheme.textSecondary;
 
   int _number(dynamic value) {
     if (value is num) return value.toInt();
@@ -41,7 +43,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final remaining = minutes % 60;
 
     if (hours == 0) return '${remaining} min';
-    return '${hours} h ${remaining} min';
+    return tr('{0} h {1} min', [hours, remaining]);
   }
 
   DateTime? _dateFromReport(Map<String, dynamic> data) {
@@ -53,7 +55,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   String _dayLabel(DateTime? date) {
     if (date == null) return '--';
-    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    final days = [tr('Lun'), tr('Mar'), tr('Mié'), tr('Jue'), tr('Vie'), tr('Sáb'), tr('Dom')];
     return days[date.weekday - 1];
   }
 
@@ -96,13 +98,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
       width: 155,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF3B2933), Color(0xFF30232B)],
+          colors: [VestaTheme.surfaceLight, VestaTheme.surface],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Color(0xFF59404A)),
+        border: Border.all(color: VestaTheme.border),
         boxShadow: const [
           BoxShadow(
             color: Color(0x33211B20),
@@ -119,7 +121,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             height: 38,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF792D43), Color(0xFFC15B68)],
+                colors: [VestaTheme.wine, VestaTheme.rose],
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -128,8 +130,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           const SizedBox(height: 15),
           Text(
             value,
-            style: const TextStyle(
-              color: Color(0xFFF4EDEA),
+            style: TextStyle(
+              color: VestaTheme.textPrimary,
               fontSize: 19,
               fontWeight: FontWeight.bold,
             ),
@@ -137,8 +139,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           const SizedBox(height: 5),
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFFD6B7A6),
+            style: TextStyle(
+              color: VestaTheme.textSecondary,
               fontSize: 12,
             ),
           ),
@@ -162,8 +164,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           const SizedBox(width: 10),
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFFF4EDEA),
+            style: TextStyle(
+              color: VestaTheme.textPrimary,
               fontSize: 17,
               fontWeight: FontWeight.bold,
             ),
@@ -229,7 +231,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     reservedSize: 38,
                     getTitlesWidget: (value, meta) => Text(
                       '${value.toStringAsFixed(0)}h',
-                      style: const TextStyle(color: _muted, fontSize: 10),
+                      style: TextStyle(color: _muted, fontSize: 12),
                     ),
                   ),
                 ),
@@ -246,9 +248,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           _dayLabel(_dateFromReport(chartReports[index])),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: _muted,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                       );
@@ -281,12 +283,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     int totalAppUsageMs,
   ) {
     if (apps.isEmpty) {
-      return const Card(
+      return Card(
         color: _card,
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Text(
-            'Todavía no hay datos de aplicaciones.',
+            tr('Todavía no hay datos de aplicaciones.'),
             style: TextStyle(color: _muted),
           ),
         ),
@@ -308,27 +310,27 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ListTile(
                 dense: true,
                 leading: CircleAvatar(
-                  backgroundColor: const Color(0xFF792D43),
+                  backgroundColor: VestaTheme.wine,
                   child: Text(
                     '${index + 1}',
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 title: Text(
-                  app['appName']?.toString() ?? 'Aplicación',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  app['appName']?.toString() ?? tr('Aplicación'),
+                  style: TextStyle(
+                    color: VestaTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 subtitle: Text(
-                  '${_duration(duration)} · $opens aperturas',
-                  style: const TextStyle(color: _muted, fontSize: 11),
+                  tr('{0} · {1} aperturas', [_duration(duration), opens]),
+                  style: TextStyle(color: _muted, fontSize: 12),
                 ),
                 trailing: Text(
                   '${percentage.toStringAsFixed(1)}%',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: VestaTheme.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -337,13 +339,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                 child: LinearProgressIndicator(
                   value: (percentage / 100).clamp(0.0, 1.0),
-                  backgroundColor: const Color(0xFF49343E),
+                  backgroundColor: VestaTheme.surfaceLight,
                   color: _accent,
                   minHeight: 5,
                 ),
               ),
               if (index != apps.length - 1)
-                const Divider(height: 1, color: Color(0xFF343A46)),
+                Divider(height: 1, color: VestaTheme.border),
             ],
           );
         }),
@@ -365,7 +367,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       final document = pw.Document();
       final now = DateTime.now();
       final period =
-          _weekly ? 'Resumen de los últimos 7 días' : 'Resumen diario';
+          _weekly ? tr('Resumen de los últimos 7 días') : tr('Resumen diario');
 
       pw.Widget cell(String value, {bool header = false}) {
         return pw.Padding(
@@ -384,10 +386,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
         pw.TableRow(
           decoration: const pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            cell('Aplicación', header: true),
-            cell('Tiempo', header: true),
-            cell('Aperturas', header: true),
-            cell('% uso', header: true),
+            cell(tr('Aplicación'), header: true),
+            cell(tr('Tiempo'), header: true),
+            cell(tr('Aperturas'), header: true),
+            cell(tr('% uso'), header: true),
           ],
         ),
       ];
@@ -398,7 +400,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             totalAppUsage > 0 ? duration / totalAppUsage * 100 : 0.0;
         appRows.add(
           pw.TableRow(children: [
-            cell(app['appName']?.toString() ?? 'Aplicación'),
+            cell(app['appName']?.toString() ?? tr('Aplicación')),
             cell(_duration(duration)),
             cell('${_number(app['launchCount'])}'),
             cell('${percentage.toStringAsFixed(1)}%'),
@@ -410,10 +412,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
         pw.TableRow(
           decoration: const pw.BoxDecoration(color: PdfColors.grey300),
           children: [
-            cell('Fecha', header: true),
-            cell('Pantalla activa', header: true),
-            cell('Uso de apps', header: true),
-            cell('Aperturas', header: true),
+            cell(tr('Fecha'), header: true),
+            cell(tr('Pantalla activa'), header: true),
+            cell(tr('Uso de apps'), header: true),
+            cell(tr('Aperturas'), header: true),
           ],
         ),
       ];
@@ -435,7 +437,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           pageFormat: PdfPageFormat.a4,
           build: (context) => [
             pw.Text(
-              'VESTA - INFORME DE ACTIVIDAD',
+              tr('VESTA - INFORME DE ACTIVIDAD'),
               style: pw.TextStyle(
                 fontSize: 19,
                 fontWeight: pw.FontWeight.bold,
@@ -443,10 +445,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             pw.SizedBox(height: 5),
             pw.Text(period),
-            pw.Text('Generado: ${DateFormat('dd/MM/yyyy HH:mm').format(now)}'),
+            pw.Text(tr('Generado: {0}', [DateFormat('dd/MM/yyyy HH:mm').format(now)])),
             pw.SizedBox(height: 18),
             pw.Text(
-              'RESUMEN',
+              tr('RESUMEN'),
               style: pw.TextStyle(
                 fontSize: 13,
                 fontWeight: pw.FontWeight.bold,
@@ -454,14 +456,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             pw.SizedBox(height: 8),
             pw.Bullet(
-                text: 'Tiempo de pantalla: ${_duration(totalScreenTime)}'),
+                text: tr('Tiempo de pantalla: {0}', [_duration(totalScreenTime)])),
             pw.Bullet(
                 text:
-                    'Uso acumulado de aplicaciones: ${_duration(totalAppUsage)}'),
-            pw.Bullet(text: 'Aperturas registradas: $totalOpens'),
+                    tr('Uso acumulado de aplicaciones: {0}', [_duration(totalAppUsage)])),
+            pw.Bullet(text: tr('Aperturas registradas: {0}', [totalOpens])),
             pw.SizedBox(height: 18),
             pw.Text(
-              'ACTIVIDAD DIARIA',
+              tr('ACTIVIDAD DIARIA'),
               style: pw.TextStyle(
                 fontSize: 13,
                 fontWeight: pw.FontWeight.bold,
@@ -474,7 +476,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             pw.SizedBox(height: 18),
             pw.Text(
-              'APLICACIONES MÁS UTILIZADAS',
+              tr('APLICACIONES MÁS UTILIZADAS'),
               style: pw.TextStyle(
                 fontSize: 13,
                 fontWeight: pw.FontWeight.bold,
@@ -487,8 +489,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             pw.SizedBox(height: 18),
             pw.Text(
-              'Nota: el tiempo de uso de aplicaciones y el tiempo de pantalla '
-              'son métricas distintas y no necesariamente coinciden.',
+              tr('Nota: el tiempo de uso de aplicaciones y el tiempo de pantalla son métricas distintas y no necesariamente coinciden.'),
               style: const pw.TextStyle(fontSize: 8),
             ),
           ],
@@ -502,113 +503,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo generar el PDF: $e')),
+          SnackBar(content: Text(tr('No se pudo generar el PDF: {0}', [e]))),
         );
       }
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
-  }
-
-  Widget _historicalReports() {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('children')
-          .doc(widget.childId)
-          .collection('reportes')
-          .orderBy('fecha', descending: true)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(color: _accent),
-            ),
-          );
-        }
-
-        final docs = snapshot.data?.docs ?? [];
-
-        if (docs.isEmpty) {
-          return const Card(
-            color: _card,
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'No hay reportes PDF anteriores.',
-                style: TextStyle(color: _muted),
-              ),
-            ),
-          );
-        }
-
-        return Card(
-          color: _card,
-          child: Column(
-            children: docs.map((doc) {
-              final data = doc.data();
-              String fechaStr = 'N/A';
-
-              if (data['fecha'] is Timestamp) {
-                fechaStr = DateFormat('dd/MM/yyyy HH:mm')
-                    .format((data['fecha'] as Timestamp).toDate());
-              } else if (data['fecha'] != null) {
-                fechaStr = data['fecha'].toString();
-              }
-
-              return ListTile(
-                title: Text(
-                  data['titulo']?.toString() ?? 'Reporte sin nombre',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(
-                  'Generado: $fechaStr',
-                  style: const TextStyle(color: _muted),
-                ),
-                trailing: const Icon(Icons.picture_as_pdf, color: _accent),
-                onTap: () async {
-                  final pdfUrl = data['pdfUrl']?.toString() ?? '';
-                  final uri = Uri.tryParse(pdfUrl);
-
-                  if (uri == null || pdfUrl.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('El reporte no contiene un enlace válido.'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  try {
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri,
-                          mode: LaunchMode.externalApplication);
-                    } else if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('No se pudo abrir el archivo PDF.'),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error al abrir el PDF: $e')),
-                      );
-                    }
-                  }
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
   }
 
   Widget _buildReport(List<Map<String, dynamic>> allReports) {
@@ -650,13 +550,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
         (_dateFromReport(a) ?? DateTime(2000))
             .compareTo(_dateFromReport(b) ?? DateTime(2000)));
 
-    String trend = 'Sin datos suficientes';
+    String trend = tr('Sin datos suficientes');
     if (ordered.length >= 2) {
       final previous =
           _number(ordered[ordered.length - 2]['totalScreenTimeMs']);
       final latest = _number(ordered.last['totalScreenTimeMs']);
       if (previous == 0) {
-        trend = latest > 0 ? 'Aumento' : 'Sin cambio';
+        trend = latest > 0 ? tr('Aumento') : tr('Sin cambio');
       } else {
         final change = ((latest - previous) / previous * 100);
         trend = '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}%';
@@ -671,20 +571,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        WeeklySummaryCard(childId: widget.childId),
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
-                'Actividad del dispositivo',
+                tr('Actividad del dispositivo'),
                 style: TextStyle(
-                  color: Colors.white,
+                  color: VestaTheme.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             IconButton(
-              tooltip: 'Exportar PDF',
+              tooltip: tr('Exportar PDF'),
               onPressed: selectedReports.isEmpty || _exporting
                   ? null
                   : () => _exportPdf(
@@ -712,23 +613,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
           spacing: 10,
           children: [
             ChoiceChip(
-              label: const Text('Últimos 7 días'),
+              label: Text(tr('Últimos 7 días')),
               selected: _weekly,
               onSelected: (_) => setState(() => _weekly = true),
-              selectedColor: const Color(0xFF792D43),
+              selectedColor: VestaTheme.wine,
             ),
             ChoiceChip(
-              label: const Text('Último día'),
+              label: Text(tr('Último día')),
               selected: !_weekly,
               onSelected: (_) => setState(() => _weekly = false),
-              selectedColor: const Color(0xFF792D43),
+              selectedColor: VestaTheme.wine,
             ),
           ],
         ),
         if (permissionRequired)
           Card(
-            color: const Color(0xFF49343E),
-            child: const Padding(
+            color: VestaTheme.surfaceLight,
+            child: Padding(
               padding: EdgeInsets.all(14),
               child: Row(
                 children: [
@@ -736,10 +637,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'El dispositivo necesita habilitar el acceso a los '
-                      'datos de uso para recopilar estadísticas. Activa '
-                      '“Acceso a datos de uso” en los ajustes de Android '
-                      'del dispositivo hijo.',
+                      tr('El dispositivo necesita habilitar el acceso a los datos de uso para recopilar estadísticas. Activa “Acceso a datos de uso” en los ajustes de Android del dispositivo hijo.'),
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -748,14 +646,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
           ),
         if (allReports.isEmpty)
-          const Card(
+          Card(
             color: _card,
             child: Padding(
               padding: EdgeInsets.all(18),
               child: Text(
-                'Todavía no hay estadísticas. Los datos aparecerán cuando '
-                'Vesta Tracker tenga habilitado el acceso a datos de uso '
-                'y complete su primera recopilación.',
+                tr('Todavía no hay estadísticas. Los datos aparecerán cuando Vesta Tracker tenga habilitado el acceso a datos de uso y complete su primera recopilación.'),
                 style: TextStyle(color: _muted),
               ),
             ),
@@ -767,44 +663,44 @@ class _ReportsScreenState extends State<ReportsScreen> {
             runSpacing: 10,
             children: [
               _metricCard(
-                'Tiempo de pantalla',
+                tr('Tiempo de pantalla'),
                 _duration(totalScreenTime),
                 Icons.screen_lock_portrait,
               ),
               _metricCard(
-                'Uso de aplicaciones',
+                tr('Uso de aplicaciones'),
                 _duration(totalAppUsage),
                 Icons.apps,
               ),
               _metricCard(
-                'Aperturas de apps',
+                tr('Aperturas de apps'),
                 '$totalOpens',
                 Icons.touch_app,
               ),
               _metricCard(
-                'Aplicaciones registradas',
+                tr('Aplicaciones registradas'),
                 '${apps.length}',
                 Icons.grid_view,
               ),
             ],
           ),
-          _sectionTitle('Actividad diaria'),
+          _sectionTitle(tr('Actividad diaria')),
           _usageChart(allReports),
-          _sectionTitle('Análisis del período'),
+          _sectionTitle(tr('Análisis del período')),
           Card(
             color: _card,
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.star, color: Colors.amber),
-                  title: const Text(
-                    'Aplicación más utilizada',
+                  title: Text(
+                    tr('Aplicación más utilizada'),
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                   subtitle: Text(
-                    mostUsed?['appName']?.toString() ?? 'Sin datos',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    mostUsed?['appName']?.toString() ?? tr('Sin datos'),
+                    style: TextStyle(
+                      color: VestaTheme.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -815,21 +711,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                const Divider(color: Color(0xFF343A46), height: 1),
+                Divider(color: VestaTheme.border, height: 1),
                 ListTile(
                   leading: const Icon(Icons.calendar_today, color: _accent),
-                  title: const Text(
-                    'Día de mayor actividad',
+                  title: Text(
+                    tr('Día de mayor actividad'),
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                   subtitle: Text(
                     peakReport == null || _dateFromReport(peakReport) == null
-                        ? 'Sin datos'
+                        ? tr('Sin datos')
                         : DateFormat('dd/MM/yyyy').format(
                             _dateFromReport(peakReport)!,
                           ),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: VestaTheme.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -840,18 +736,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                const Divider(color: Color(0xFF343A46), height: 1),
+                Divider(color: VestaTheme.border, height: 1),
                 ListTile(
                   leading:
                       const Icon(Icons.trending_up, color: Colors.lightBlue),
-                  title: const Text(
-                    'Variación frente al día anterior',
+                  title: Text(
+                    tr('Variación frente al día anterior'),
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                   trailing: Text(
                     trend,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: VestaTheme.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -859,18 +755,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ],
             ),
           ),
-          _sectionTitle('Ranking de aplicaciones'),
+          _sectionTitle(tr('Ranking de aplicaciones')),
           _appRanking(apps, totalAppUsage),
           const SizedBox(height: 8),
-          const Text(
-            'El tiempo de pantalla y la suma del tiempo en aplicaciones '
-            'son métricas distintas. Pueden diferir por actividades del '
-            'sistema, ventanas múltiples y el método de medición de Android.',
-            style: TextStyle(color: _muted, fontSize: 11),
+          Text(
+            tr('El tiempo de pantalla y la suma del tiempo en aplicaciones son métricas distintas. Pueden diferir por actividades del sistema, ventanas múltiples y el método de medición de Android.'),
+            style: TextStyle(color: _muted, fontSize: 12),
           ),
         ],
-        _sectionTitle('Historial de informes PDF'),
-        _historicalReports(),
         const SizedBox(height: 30),
       ],
     );
@@ -893,7 +785,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             if (snapshot.hasError) {
               return Center(
                 child: Text(
-                  'Error cargando estadísticas: ${snapshot.error}',
+                  tr('Error cargando estadísticas: {0}', [snapshot.error]),
                   style: const TextStyle(color: Colors.redAccent),
                   textAlign: TextAlign.center,
                 ),

@@ -1,17 +1,29 @@
-# vesta_app
+# Vesta Parent (vesta_app)
 
-A new Flutter project.
+Guardian app of **Vesta Security**, a family digital protection service for Android.
+It pairs with **Vesta Tracker**, installed on the minor's phone.
 
-## Getting Started
+Main features: dashboard with linked devices, QR linking, location and safe zones,
+SOS alerts, usage reports (PDF export and weekly summary), study mode, daily time
+limits, requests from the minor, web filters with safe search, alerts and
+privacy authorisations per purpose.
 
-This project is a starting point for a Flutter application.
+## Development
 
-VESTA is an open-source parental control solution,
-focused on the digital protection of minors.
+- Flutter 3 / Dart 3, Android (minSdk 24).
+- Firebase project `vesta-opensource` (Auth, Firestore, FCM). Backend: `vesta-api`.
+- UI language: Spanish and English (`lib/l10n/`). Spanish text is the key; English
+  lives in `lib/l10n/en.dart`. Use `tr('…')` for every visible string.
+- Legal documents: `assets/legal/` (Spanish, official) and `assets/legal/en/`
+  (courtesy translation).
 
-Its cross-platform architecture allows native operation on Android and iOS,
-as well as compatibility with Windows, Linux, and macOS,
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release   # needs android/key.properties (not in the repository)
+```
 
-guaranteeing a unified experience for guardians and
-minors regardless of the operating system used.
+## Licence
 
+Proprietary software. © FORBIDDEN S.A.S. All rights reserved. See `LICENSE`.

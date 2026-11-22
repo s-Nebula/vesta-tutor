@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:vesta_app/theme/vesta_theme.dart';
+import 'package:vesta_app/widgets/web_protection_card.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class FiltersScreen extends StatefulWidget {
   final String childId;
   final String tutorId;
@@ -20,9 +23,10 @@ class FiltersScreen extends StatefulWidget {
 class _FiltersScreenState extends State<FiltersScreen> {
   static const Color _wine = Color(0xFF792D43);
   static const Color _rose = Color(0xFFC15B68);
-  static const Color _ivory = Color(0xFFF4EDEA);
-  static const Color _dark = Color(0xFF211B20);
-  static const Color _surface = Color(0xFF30232B);
+  // Text and surfaces follow the theme; _dark is the text colour of light fields.
+  static Color get _ivory => VestaTheme.textPrimary;
+  static const Color _dark = VestaTheme.dark;
+  static Color get _surface => VestaTheme.surface;
   static const Color _muted = Color(0xFF927F85);
 
   final _valueController = TextEditingController();
@@ -66,13 +70,13 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Regla añadida correctamente')),
+          SnackBar(content: Text(tr('Regla añadida correctamente'))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e')),
+          SnackBar(content: Text(tr('Error al guardar: {0}', [e]))),
         );
       }
     } finally {
@@ -86,7 +90,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar: $e')),
+          SnackBar(content: Text(tr('Error al actualizar: {0}', [e]))),
         );
       }
     }
@@ -97,13 +101,13 @@ class _FiltersScreenState extends State<FiltersScreen> {
       await _rules.doc(ruleId).delete();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Regla eliminada')),
+          SnackBar(content: Text(tr('Regla eliminada'))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar: $e')),
+          SnackBar(content: Text(tr('Error al eliminar: {0}', [e]))),
         );
       }
     }
@@ -159,11 +163,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Aplicaciones',
+                              tr('Aplicaciones'),
                               style: TextStyle(
-                                color: Colors.white,
+                                color: VestaTheme.textPrimary,
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -171,18 +175,18 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(dialogContext),
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.close_rounded,
-                              color: Colors.white70,
+                              color: VestaTheme.textSecondary,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${selected.length} aplicaciones seleccionadas',
-                        style: const TextStyle(
-                          color: Color(0xFFD6B7A6),
+                        tr('{0} aplicaciones seleccionadas', [selected.length]),
+                        style: TextStyle(
+                          color: VestaTheme.textSecondary,
                           fontSize: 13,
                         ),
                       ),
@@ -209,8 +213,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             if (snapshot.hasError) {
                               return Center(
                                 child: Text(
-                                  'Error al cargar aplicaciones: '
-                                  '${snapshot.error}',
+                                  tr('Error al cargar aplicaciones: {0}', [snapshot.error]),
                                   style: const TextStyle(
                                     color: Colors.redAccent,
                                   ),
@@ -231,16 +234,14 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             });
 
                             if (apps.isEmpty) {
-                              return const Center(
+                              return Center(
                                 child: Padding(
                                   padding: EdgeInsets.all(20),
                                   child: Text(
-                                    'Todavía no hay aplicaciones disponibles.\n\n'
-                                    'Abre Vesta Tracker en el dispositivo '
-                                    'hijo y espera a que sincronice el catálogo.',
+                                    tr('Todavía no hay aplicaciones disponibles.\n\nAbre Vesta Tracker en el dispositivo hijo y espera a que sincronice el catálogo.'),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      color: Colors.white70,
+                                      color: VestaTheme.textSecondary,
                                       height: 1.5,
                                     ),
                                   ),
@@ -260,9 +261,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                 final iconBase64 =
                                     (data['iconBase64'] ?? '').toString();
 
-                                Widget appIcon = const Icon(
+                                Widget appIcon = Icon(
                                   Icons.android_rounded,
-                                  color: Color(0xFFD6B7A6),
+                                  color: VestaTheme.textSecondary,
                                   size: 30,
                                 );
 
@@ -273,14 +274,14 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                       width: 38,
                                       height: 38,
                                       fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => const Icon(
+                                      errorBuilder: (_, __, ___) => Icon(
                                         Icons.android_rounded,
-                                        color: Color(0xFFD6B7A6),
+                                        color: VestaTheme.textSecondary,
                                         size: 30,
                                       ),
                                     );
                                   } catch (_) {
-                                    // Se utiliza el icono genérico.
+                                    // Use the generic icon.
                                   }
                                 }
 
@@ -290,12 +291,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 7),
                                   decoration: BoxDecoration(
-                                    color: _dark,
+                                    color: VestaTheme.background,
                                     borderRadius: BorderRadius.circular(15),
                                     border: Border.all(
                                       color: isSelected
                                           ? _rose.withValues(alpha: 0.65)
-                                          : Colors.white12,
+                                          : VestaTheme.border,
                                     ),
                                   ),
                                   child: CheckboxListTile(
@@ -312,16 +313,16 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                     secondary: appIcon,
                                     title: Text(
                                       appName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: VestaTheme.textPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     subtitle: Text(
                                       packageName,
-                                      style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 10,
+                                      style: TextStyle(
+                                        color: VestaTheme.textSecondary,
+                                        fontSize: 12,
                                       ),
                                     ),
                                     activeColor: _rose,
@@ -343,21 +344,21 @@ class _FiltersScreenState extends State<FiltersScreen> {
                               onPressed: () => Navigator.pop(dialogContext),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white70,
-                                side: const BorderSide(color: Colors.white24),
+                                side: BorderSide(color: VestaTheme.border),
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: const Text('Cancelar'),
+                              child: Text(tr('Cancelar')),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             flex: 2,
                             child: _gradientButton(
-                              label: 'Guardar selección',
+                              label: tr('Guardar selección'),
                               icon: Icons.check_rounded,
                               onPressed: () async {
                                 Navigator.pop(dialogContext);
@@ -398,10 +399,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   if (mounted) {
                                     ScaffoldMessenger.of(this.context)
                                         .showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         content: Text(
-                                          'Aplicaciones actualizadas '
-                                          'correctamente',
+                                          tr('Aplicaciones actualizadas correctamente'),
                                         ),
                                       ),
                                     );
@@ -411,7 +411,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                     ScaffoldMessenger.of(this.context)
                                         .showSnackBar(
                                       SnackBar(
-                                        content: Text('Error al guardar: $e'),
+                                        content: Text(tr('Error al guardar: {0}', [e])),
                                       ),
                                     );
                                   }
@@ -441,11 +441,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_dark, Color(0xFF30232B)],
+          colors: VestaTheme.screenGradient.colors,
         ),
       ),
       child: Padding(
@@ -477,12 +477,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   ),
                 ),
                 const SizedBox(width: 13),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Control de contenido',
+                        tr('Control de contenido'),
                         style: TextStyle(
                           color: _ivory,
                           fontSize: 19,
@@ -491,10 +491,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                       ),
                       SizedBox(height: 3),
                       Text(
-                        'Administra las restricciones del dispositivo',
+                        tr('Administra las restricciones del dispositivo'),
                         style: TextStyle(
                           color: Color(0xFFB9A8AD),
-                          fontSize: 11,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -502,19 +502,21 @@ class _FiltersScreenState extends State<FiltersScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 14),
+            WebProtectionCard(childId: widget.childId),
+            const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: _surface,
                 borderRadius: BorderRadius.circular(17),
-                border: Border.all(color: Colors.white10),
+                border: Border.all(color: VestaTheme.border),
               ),
               child: Row(
                 children: [
-                  _typeButton('Lista negra', 'block', Icons.block_rounded),
+                  _typeButton(tr('Lista negra'), 'block', Icons.block_rounded),
                   _typeButton(
-                    'Lista blanca',
+                    tr('Lista blanca'),
                     'allow',
                     Icons.verified_user_rounded,
                   ),
@@ -523,11 +525,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
             ),
             if (_selectedType == 'block') ...[
               const SizedBox(height: 18),
-              const Text(
-                'CATEGORÍA DE BLOQUEO',
+              Text(
+                tr('CATEGORÍA DE BLOQUEO'),
                 style: TextStyle(
-                  color: Color(0xFFD6B7A6),
-                  fontSize: 10,
+                  color: VestaTheme.textSecondary,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
@@ -536,19 +538,19 @@ class _FiltersScreenState extends State<FiltersScreen> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 dropdownColor: _surface,
-                style: const TextStyle(color: _ivory),
+                style: TextStyle(color: _ivory),
                 decoration: _inputDecoration(
-                  label: 'Tipo de bloqueo',
+                  label: tr('Tipo de bloqueo'),
                   icon: Icons.tune_rounded,
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'url',
-                    child: Text('Dominio web'),
+                    child: Text(tr('Dominio web')),
                   ),
                   DropdownMenuItem(
                     value: 'app',
-                    child: Text('Aplicación Android'),
+                    child: Text(tr('Aplicación Android')),
                   ),
                 ],
                 onChanged: (value) {
@@ -561,7 +563,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
             const SizedBox(height: 16),
             if (_selectedType == 'block' && _selectedCategory == 'app')
               _gradientButton(
-                label: 'Elegir aplicaciones instaladas',
+                label: tr('Elegir aplicaciones instaladas'),
                 icon: Icons.apps_rounded,
                 onPressed: _selectApps,
               )
@@ -577,8 +579,8 @@ class _FiltersScreenState extends State<FiltersScreen> {
                       ),
                       decoration: _inputDecoration(
                         label: _selectedType == 'block'
-                            ? 'Ejemplo: sitio-web.com'
-                            : 'Ejemplo: educacion.com',
+                            ? tr('Ejemplo: sitio-web.com')
+                            : tr('Ejemplo: educacion.com'),
                         icon: Icons.language_rounded,
                         light: true,
                       ),
@@ -604,9 +606,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
             const SizedBox(height: 22),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Reglas configuradas',
+                    tr('Reglas configuradas'),
                     style: TextStyle(
                       color: _ivory,
                       fontSize: 16,
@@ -623,11 +625,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     color: _wine.withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'EN VIGOR',
+                  child: Text(
+                    tr('EN VIGOR'),
                     style: TextStyle(
                       color: Color(0xFFE9B8BD),
-                      fontSize: 9,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1,
                     ),
@@ -649,7 +651,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   if (snapshot.hasError) {
                     return Center(
                       child: Text(
-                        'Error al cargar reglas: ${snapshot.error}',
+                        tr('Error al cargar reglas: {0}', [snapshot.error]),
                         style: const TextStyle(color: Colors.redAccent),
                         textAlign: TextAlign.center,
                       ),
@@ -678,19 +680,19 @@ class _FiltersScreenState extends State<FiltersScreen> {
                         decoration: BoxDecoration(
                           color: _surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white10),
+                          border: Border.all(color: VestaTheme.border),
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.shield_outlined,
-                              color: Color(0xFFD6B7A6),
+                              color: VestaTheme.textSecondary,
                               size: 38,
                             ),
                             SizedBox(height: 12),
                             Text(
-                              'Sin reglas configuradas',
+                              tr('Sin reglas configuradas'),
                               style: TextStyle(
                                 color: _ivory,
                                 fontWeight: FontWeight.bold,
@@ -698,8 +700,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Añade una regla para comenzar a proteger '
-                              'el dispositivo.',
+                              tr('Añade una regla para comenzar a proteger el dispositivo.'),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: _muted,
@@ -733,7 +734,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           border: Border.all(
                             color: enabled
                                 ? _rose.withValues(alpha: 0.24)
-                                : Colors.white10,
+                                : VestaTheme.border,
                           ),
                         ),
                         child: Row(
@@ -746,8 +747,8 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   colors: enabled
                                       ? [_wine, _rose]
                                       : [
-                                          Colors.grey.shade800,
-                                          Colors.grey.shade700,
+                                          VestaTheme.burgundy,
+                                          VestaTheme.wine,
                                         ],
                                 ),
                                 borderRadius: BorderRadius.circular(13),
@@ -772,17 +773,17 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: enabled ? _ivory : Colors.white54,
+                                      color: enabled ? _ivory : VestaTheme.textSecondary,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    enabled ? 'Activa' : 'Desactivada',
+                                    enabled ? tr('Activa') : tr('Desactivada'),
                                     style: TextStyle(
                                       color: enabled ? _rose : _muted,
-                                      fontSize: 10,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -794,11 +795,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                               onChanged: (value) => _updateRule(doc.id, value),
                             ),
                             IconButton(
-                              tooltip: 'Eliminar regla',
+                              tooltip: tr('Eliminar regla'),
                               onPressed: () => _deleteRule(doc.id),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.delete_outline_rounded,
-                                color: Color(0xFFD6B7A6),
+                                color: VestaTheme.textSecondary,
                                 size: 21,
                               ),
                             ),
@@ -851,7 +852,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: selected ? Colors.white : _muted,
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -867,17 +868,17 @@ class _FiltersScreenState extends State<FiltersScreen> {
     required IconData icon,
     bool light = false,
   }) {
-    final foreground = light ? _dark : _ivory;
+    final foreground = light ? VestaTheme.dark : _ivory;
 
     return InputDecoration(
       hintText: label,
       hintStyle: TextStyle(
-        color: light ? _muted : Colors.white54,
+        color: light ? _muted : VestaTheme.textSecondary,
         fontSize: 12,
       ),
       prefixIcon: Icon(icon, color: light ? _wine : _rose, size: 20),
       filled: true,
-      fillColor: light ? _ivory : _surface,
+      fillColor: light ? VestaTheme.ivory : _surface,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 15,
         vertical: 16,
@@ -889,7 +890,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(
-          color: light ? _ivory : Colors.white10,
+          color: light ? VestaTheme.ivory : VestaTheme.border,
         ),
       ),
       focusedBorder: OutlineInputBorder(

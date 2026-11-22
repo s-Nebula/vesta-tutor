@@ -8,11 +8,37 @@ class VestaTheme {
   static const Color dark = Color(0xFF211B20);
   static const Color beige = Color(0xFFD6B7A6);
 
-  static const Color background = dark;
-  static const Color surface = Color(0xFF30232B);
-  static const Color surfaceLight = Color(0xFF3B2933);
-  static const Color textPrimary = ivory;
-  static const Color textSecondary = beige;
+  // ---------------------------------------------------------------------
+  // Semantic colours: they change with light/dark mode. Use them instead of
+  // fixed values so every screen follows the chosen theme.
+  // ---------------------------------------------------------------------
+  static bool _isDark = true;
+
+  static bool get isDark => _isDark;
+
+  /// Called by MyApp when building the app with the effective mode.
+  static void applyBrightness(Brightness brightness) {
+    _isDark = brightness == Brightness.dark;
+  }
+
+  static Color get background => _isDark ? dark : ivory;
+  static Color get surface => _isDark ? const Color(0xFF30232B) : Colors.white;
+  static Color get surfaceLight =>
+      _isDark ? const Color(0xFF3B2933) : const Color(0xFFF1E6E3);
+  static Color get textPrimary => _isDark ? ivory : dark;
+  static Color get textSecondary => _isDark ? beige : const Color(0xFF6E5A62);
+  static Color get border =>
+      _isDark ? beige.withValues(alpha: 0.12) : burgundy.withValues(alpha: 0.12);
+
+  // Estados: iguales en ambos modos.
+  static const Color danger = Color(0xFFE03131);
+  static const Color warning = Color(0xFFE3A008);
+  static const Color info = Color(0xFF537FCB);
+  static const Color success = Color(0xFF3FA772);
+  static const Color study = Color(0xFF3B5BA5);
+
+  /// Minimum text size across the app (accessibility).
+  static const double minFontSize = 12;
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [wine, rose],
@@ -20,33 +46,44 @@ class VestaTheme {
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient backgroundGradient = LinearGradient(
-    colors: [dark, burgundy],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static LinearGradient get backgroundGradient => LinearGradient(
+        colors: _isDark
+            ? const [dark, burgundy]
+            : const [ivory, Color(0xFFF1E1DF)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+
+  /// Degradado de fondo de pantallas de contenido (estado, filtros...).
+  static LinearGradient get screenGradient => LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: _isDark
+            ? const [Color(0xFF211B20), Color(0xFF421827), Color(0xFF30232B)]
+            : const [Color(0xFFF4EDEA), Color(0xFFF7E9E8), Color(0xFFF4EDEA)],
+      );
 
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: background,
+      scaffoldBackgroundColor: dark,
       colorScheme: const ColorScheme.dark(
         primary: rose,
         secondary: beige,
-        surface: surface,
+        surface: Color(0xFF30232B),
         onPrimary: Colors.white,
         onSecondary: dark,
-        onSurface: textPrimary,
+        onSurface: ivory,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: dark,
-        foregroundColor: textPrimary,
+        foregroundColor: ivory,
         centerTitle: true,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
-        color: surface,
+        color: const Color(0xFF30232B),
         elevation: 3,
         shadowColor: Colors.black.withValues(alpha: 0.25),
         shape: RoundedRectangleBorder(
@@ -70,7 +107,7 @@ class VestaTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceLight,
+        fillColor: const Color(0xFF3B2933),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 16,
@@ -141,6 +178,37 @@ class VestaTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFFF1E6E3),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: burgundy.withValues(alpha: 0.12)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: wine, width: 1.5),
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: wine,
+        foregroundColor: Colors.white,
+        elevation: 6,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
         ),
       ),
     );

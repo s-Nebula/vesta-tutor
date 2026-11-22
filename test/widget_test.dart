@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:vesta_app/main.dart';
 import 'package:vesta_app/theme_notifier.dart';
+import 'package:vesta_app/l10n/tr.dart';
 
 void main() {
   testWidgets('La aplicación inicia y muestra su ruta inicial',
@@ -23,8 +24,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => ThemeNotifier(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+          ChangeNotifierProvider(create: (_) => LanguageNotifier()),
+        ],
         child: MyApp(router: router),
       ),
     );

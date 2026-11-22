@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:vesta_app/services/notification_service.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -51,7 +53,7 @@ class AuthService {
 
       final user = credential.user;
       if (user == null) {
-        throw Exception('No se pudo crear la cuenta.');
+        throw Exception(tr('No se pudo crear la cuenta.'));
       }
 
       await _ensureUserDocument(user, username: normalizedUsername);
@@ -85,7 +87,7 @@ class AuthService {
 
       final googleAuth = await googleUser.authentication;
       if (googleAuth.idToken == null && googleAuth.accessToken == null) {
-        throw Exception('Google no devolvió credenciales de autenticación.');
+        throw Exception(tr('Google no devolvió credenciales de autenticación.'));
       }
 
       final credential = GoogleAuthProvider.credential(
@@ -104,7 +106,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw Exception(_handleAuthError(e.code));
     } catch (e) {
-      throw Exception('No se pudo iniciar sesión con Google: $e');
+      throw Exception(tr('No se pudo iniciar sesión con Google: {0}', [e]));
     }
   }
 
@@ -120,7 +122,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw Exception(_handleAuthError(e.code));
     } catch (e) {
-      throw Exception('No se pudo iniciar sesión con GitHub: $e');
+      throw Exception(tr('No se pudo iniciar sesión con GitHub: {0}', [e]));
     }
   }
 
@@ -133,37 +135,44 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    // Push token first: after signing out there would be no permission left
+    // to delete it and this phone would keep receiving the alerts.
+    await NotificationService.instance.unregisterCurrentDevice();
     await _auth.signOut();
-    await _googleSignIn.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {
+      // No Google session or no network: does not prevent signing out of Vesta.
+    }
   }
 
   String _handleAuthError(String code) {
     switch (code) {
       case 'invalid-credential':
       case 'wrong-password':
-        return 'Correo o contraseña incorrectos.';
+        return tr('Correo o contraseña incorrectos.');
       case 'user-not-found':
-        return 'No existe una cuenta con este correo.';
+        return tr('No existe una cuenta con este correo.');
       case 'email-already-in-use':
-        return 'Este correo ya está registrado.';
+        return tr('Este correo ya está registrado.');
       case 'invalid-email':
-        return 'El correo electrónico no es válido.';
+        return tr('El correo electrónico no es válido.');
       case 'weak-password':
-        return 'La contraseña es demasiado débil.';
+        return tr('La contraseña es demasiado débil.');
       case 'too-many-requests':
-        return 'Demasiados intentos. Inténtalo más tarde.';
+        return tr('Demasiados intentos. Inténtalo más tarde.');
       case 'network-request-failed':
-        return 'Error de conexión. Comprueba tu internet.';
+        return tr('Error de conexión. Comprueba tu internet.');
       case 'operation-not-allowed':
-        return 'Este método de inicio de sesión no está habilitado en Firebase.';
+        return tr('Este método de inicio de sesión no está habilitado en Firebase.');
       case 'user-disabled':
-        return 'Esta cuenta ha sido deshabilitada.';
+        return tr('Esta cuenta ha sido deshabilitada.');
       case 'account-exists-with-different-credential':
-        return 'Ya existe una cuenta con este correo usando otro método de acceso.';
+        return tr('Ya existe una cuenta con este correo usando otro método de acceso.');
       case 'credential-already-in-use':
-        return 'Estas credenciales ya están vinculadas a otra cuenta.';
+        return tr('Estas credenciales ya están vinculadas a otra cuenta.');
       default:
-        return 'Error de autenticación ($code).';
+        return tr('Error de autenticación ({0}).', [code]);
     }
   }
 }

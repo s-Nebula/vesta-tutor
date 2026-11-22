@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:vesta_app/widgets/privacy_access_gate.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vesta_app/services/api_client.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class PrivacyConsentScreen extends StatefulWidget {
   final Future<void> Function()? onConsentChanged;
 
@@ -19,20 +21,28 @@ class PrivacyConsentScreen extends StatefulWidget {
 class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
   late Future<Map<String, dynamic>> _statusFuture;
 
-  static const Map<String, String> _purposes = {
-    'location': 'Ubicación e historial',
-    'device_status': 'Estado del dispositivo',
-    'usage_stats': 'Estadísticas de uso de aplicaciones',
-    'app_filtering': 'Filtrado de aplicaciones',
-    'domain_filtering': 'Filtrado de dominios',
-    'alerts': 'Alertas y eventos',
+  static Map<String, String> get _purposes => {
+    'location': tr('Ubicación e historial'),
+    'device_status': tr('Estado del dispositivo'),
+    'usage_stats': tr('Estadísticas de uso de aplicaciones'),
+    'app_filtering': tr('Filtrado de aplicaciones'),
+    'domain_filtering': tr('Filtrado de dominios'),
+    'alerts': tr('Alertas y eventos'),
   };
 
-  static const Map<String, String> _documents = {
-    'Términos y condiciones': 'assets/legal/terminos_y_condiciones.txt',
-    'Política de privacidad': 'assets/legal/politica_privacidad.txt',
-    'Guía de usuario': 'assets/legal/guia_usuario.txt',
-  };
+  /// Legal documents shown in the app. English versions are a courtesy
+  /// translation; the Spanish text prevails.
+  static Map<String, String> get _documents => isEnglish
+      ? {
+          'Terms and Conditions': 'assets/legal/en/terms_and_conditions.txt',
+          'Privacy Policy': 'assets/legal/en/privacy_policy.txt',
+          'User Guide': 'assets/legal/en/user_guide.txt',
+        }
+      : {
+          'Términos y condiciones': 'assets/legal/terminos_y_condiciones.txt',
+          'Política de privacidad': 'assets/legal/politica_privacidad.txt',
+          'Guía de usuario': 'assets/legal/guia_usuario.txt',
+        };
 
   final Map<String, bool> _selectedPurposes = {
     for (final key in _purposes.keys) key: false,
@@ -84,7 +94,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cerrar'),
+              child: Text(tr('Cerrar')),
             ),
           ],
         ),
@@ -92,7 +102,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo abrir el documento: $error')),
+        SnackBar(content: Text(tr('No se pudo abrir el documento: {0}', [error]))),
       );
     }
   }
@@ -108,9 +118,9 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         !_guardianDeclaration ||
         _minorParticipation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Debes completar todas las confirmaciones obligatorias.',
+            tr('Debes completar todas las confirmaciones obligatorias.'),
           ),
         ),
       );
@@ -133,11 +143,12 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         },
       );
 
+      PrivacyAccessGate.invalidate();
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Consentimiento enviado. Verificando estado...'),
+        SnackBar(
+          content: Text(tr('Consentimiento enviado. Verificando estado...')),
         ),
       );
 
@@ -157,7 +168,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No se pudo registrar el consentimiento: $error'),
+          content: Text(tr('No se pudo registrar el consentimiento: {0}', [error])),
         ),
       );
     } finally {
@@ -174,22 +185,21 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          isAll ? 'Revocar todas las autorizaciones' : 'Revocar autorización',
+          isAll ? tr('Revocar todas las autorizaciones') : tr('Revocar autorización'),
         ),
         content: Text(
           isAll
-              ? '¿Quieres revocar todas las autorizaciones de privacidad?'
-              : '¿Quieres revocar la autorización para '
-                  '${_purposes[purpose] ?? purpose}?',
+              ? tr('¿Quieres revocar todas las autorizaciones de privacidad?')
+              : tr('¿Quieres revocar la autorización para {0}?', [_purposes[purpose] ?? purpose]),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancelar'),
+            child: Text(tr('Cancelar')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Revocar'),
+            child: Text(tr('Revocar')),
           ),
         ],
       ),
@@ -203,11 +213,12 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         body: {'purpose': purpose},
       );
 
+      PrivacyAccessGate.invalidate();
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Solicitud de revocación procesada.'),
+        SnackBar(
+          content: Text(tr('Solicitud de revocación procesada.')),
         ),
       );
 
@@ -218,7 +229,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo revocar la autorización: $error')),
+        SnackBar(content: Text(tr('No se pudo revocar la autorización: {0}', [error]))),
       );
     }
   }
@@ -231,10 +242,18 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Documentos de Vesta',
+              tr('Documentos de Vesta'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
+            if (isEnglish)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  'Courtesy translation. The Spanish version is the official text and prevails in case of any discrepancy.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             ..._documents.entries.map(
               (entry) => ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -259,13 +278,12 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
       children: [
         const SizedBox(height: 16),
         Text(
-          'Autorizaciones y finalidades',
+          tr('Autorizaciones y finalidades'),
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Cada finalidad es independiente y opcional. '
-          'Deja desmarcadas aquellas que no autorizas.',
+        Text(
+          tr('Cada finalidad es independiente y opcional. Deja desmarcadas aquellas que no autorizas.'),
         ),
         const SizedBox(height: 8),
         ..._purposes.entries.map(
@@ -273,7 +291,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
             child: CheckboxListTile(
               value: _selectedPurposes[entry.key] ?? false,
               title: Text(entry.value),
-              subtitle: const Text('Autorización independiente'),
+              subtitle: Text(tr('Autorización independiente')),
               controlAffinity: ListTileControlAffinity.leading,
               onChanged: (value) {
                 setState(() {
@@ -285,13 +303,13 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Participación del menor',
+          tr('Participación del menor'),
           style: Theme.of(context).textTheme.titleMedium,
         ),
         RadioListTile<String>(
           value: 'informed',
           groupValue: _minorParticipation,
-          title: const Text('El menor fue informado'),
+          title: Text(tr('El menor fue informado')),
           onChanged: (value) => setState(
             () => _minorParticipation = value,
           ),
@@ -299,7 +317,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         RadioListTile<String>(
           value: 'heard',
           groupValue: _minorParticipation,
-          title: const Text('Se escuchó la opinión del menor'),
+          title: Text(tr('Se escuchó la opinión del menor')),
           onChanged: (value) => setState(
             () => _minorParticipation = value,
           ),
@@ -307,7 +325,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
         RadioListTile<String>(
           value: 'not_applicable',
           groupValue: _minorParticipation,
-          title: const Text('No aplica'),
+          title: Text(tr('No aplica')),
           onChanged: (value) => setState(
             () => _minorParticipation = value,
           ),
@@ -320,7 +338,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
               children: [
                 CheckboxListTile(
                   value: _acceptTerms,
-                  title: const Text('Acepto los términos y condiciones.'),
+                  title: Text(tr('Acepto los términos y condiciones.')),
                   controlAffinity: ListTileControlAffinity.leading,
                   onChanged: (value) => setState(
                     () => _acceptTerms = value ?? false,
@@ -328,8 +346,8 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                 ),
                 CheckboxListTile(
                   value: _acknowledgePrivacy,
-                  title: const Text(
-                    'Confirmo que he leído la política de privacidad.',
+                  title: Text(
+                    tr('Confirmo que he leído la política de privacidad.'),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   onChanged: (value) => setState(
@@ -338,9 +356,8 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                 ),
                 CheckboxListTile(
                   value: _guardianDeclaration,
-                  title: const Text(
-                    'Declaro que soy tutor, representante legal o '
-                    'persona autorizada y que actúo bajo mi responsabilidad.',
+                  title: Text(
+                    tr('Declaro que soy tutor, representante legal o persona autorizada y que actúo bajo mi responsabilidad.'),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   onChanged: (value) => setState(
@@ -371,7 +388,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                   )
                 : const Icon(Icons.verified_user_outlined),
             label: Text(
-              _submitting ? 'Enviando...' : 'Registrar consentimiento',
+              _submitting ? tr('Enviando...') : tr('Registrar consentimiento'),
             ),
           ),
         ),
@@ -394,13 +411,13 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: canGoBack ? 'Volver' : 'Cerrar sesión',
+          tooltip: canGoBack ? tr('Volver') : tr('Cerrar sesión'),
           onPressed: _handleBack,
           icon: Icon(
             canGoBack ? Icons.arrow_back : Icons.logout,
           ),
         ),
-        title: const Text('Privacidad y autorizaciones'),
+        title: Text(tr('Privacidad y autorizaciones')),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _statusFuture,
@@ -418,8 +435,8 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                   children: [
                     const Icon(Icons.cloud_off_outlined, size: 42),
                     const SizedBox(height: 12),
-                    const Text(
-                      'No se pudo consultar el estado de privacidad.',
+                    Text(
+                      tr('No se pudo consultar el estado de privacidad.'),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -430,7 +447,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                         });
                       },
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Reintentar'),
+                      label: Text(tr('Reintentar')),
                     ),
                   ],
                 ),
@@ -458,14 +475,14 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
               : <String, dynamic>{};
 
           final termsVersion =
-              versions['termsVersion']?.toString() ?? 'No disponible';
+              versions['termsVersion']?.toString() ?? tr('No disponible');
           final privacyVersion =
-              versions['privacyVersion']?.toString() ?? 'No disponible';
+              versions['privacyVersion']?.toString() ?? tr('No disponible');
 
           final isDraft = termsVersion.toLowerCase().contains('draft') ||
               privacyVersion.toLowerCase().contains('draft');
 
-          final status = consent['status']?.toString() ?? 'sin registro';
+          final status = consent['status']?.toString() ?? tr('sin registro');
 
           return RefreshIndicator(
             onRefresh: _refresh,
@@ -484,7 +501,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'Estado del consentimiento',
+                                tr('Estado del consentimiento'),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -493,14 +510,14 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                         const SizedBox(height: 12),
                         Text(
                           exists
-                              ? 'Registro: $status'
-                              : 'Todavía no existe un registro de consentimiento.',
+                              ? tr('Registro: {0}', [status])
+                              : tr('Todavía no existe un registro de consentimiento.'),
                         ),
                         const SizedBox(height: 6),
-                        Text('Consentimiento válido: ${valid ? "Sí" : "No"}'),
+                        Text(tr('Consentimiento válido: {0}', [valid ? tr('Sí') : tr('No')])),
                         const SizedBox(height: 6),
-                        Text('Términos: $termsVersion'),
-                        Text('Privacidad: $privacyVersion'),
+                        Text(tr('Términos: {0}', [termsVersion])),
+                        Text(tr('Privacidad: {0}', [privacyVersion])),
                       ],
                     ),
                   ),
@@ -508,13 +525,10 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                 if (isDraft)
                   Card(
                     color: VestaTheme.surfaceLight,
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.all(16),
                       child: Text(
-                        'Los documentos legales todavía están en versión '
-                        'borrador. La aceptación está deshabilitada hasta '
-                        'que se aprueben y configuren las versiones '
-                        'definitivas en el servidor.',
+                        tr('Los documentos legales todavía están en versión borrador. La aceptación está deshabilitada hasta que se aprueben y configuren las versiones definitivas en el servidor.'),
                       ),
                     ),
                   ),
@@ -524,7 +538,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                 ] else ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Finalidades autorizadas',
+                    tr('Finalidades autorizadas'),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
@@ -540,11 +554,11 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                         ),
                         title: Text(entry.value),
                         subtitle: Text(
-                          enabled ? 'Autorizada' : 'No autorizada',
+                          enabled ? tr('Autorizada') : tr('No autorizada'),
                         ),
                         trailing: enabled
                             ? IconButton(
-                                tooltip: 'Revocar autorización',
+                                tooltip: tr('Revocar autorización'),
                                 icon: const Icon(Icons.remove_circle_outline),
                                 onPressed: () => _revoke(entry.key),
                               )
@@ -557,19 +571,16 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                     OutlinedButton.icon(
                       onPressed: () => _revoke('all'),
                       icon: const Icon(Icons.block),
-                      label: const Text('Revocar todas las autorizaciones'),
+                      label: Text(tr('Revocar todas las autorizaciones')),
                     ),
                   ],
                 ],
                 const SizedBox(height: 16),
-                const Card(
+                Card(
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: Text(
-                      'La autorización efectiva de un menor también depende '
-                      'del consentimiento de todos sus tutores asociados y '
-                      'de que tenga un dispositivo correctamente vinculado. '
-                      'La revocación se aplica según las reglas del servicio.',
+                      tr('La autorización efectiva de un menor también depende del consentimiento de todos sus tutores asociados y de que tenga un dispositivo correctamente vinculado. La revocación se aplica según las reglas del servicio.'),
                     ),
                   ),
                 ),
@@ -577,7 +588,7 @@ class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
                 TextButton.icon(
                   onPressed: _refresh,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Actualizar estado'),
+                  label: Text(tr('Actualizar estado')),
                 ),
               ],
             ),

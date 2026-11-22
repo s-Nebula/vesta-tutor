@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vesta_app/services/auth_service.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -30,7 +31,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = emailController.text.trim();
 
     if (email.isEmpty || !email.contains('@')) {
-      _showMessage('Introduce un correo electrónico válido.');
+      _showMessage(tr('Introduce un correo electrónico válido.'));
       return;
     }
 
@@ -42,8 +43,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Se ha enviado un correo de recuperación.'),
+        SnackBar(
+          content: Text(tr('Se ha enviado un correo de recuperación.')),
         ),
       );
 
@@ -93,7 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           Icons.arrow_back_rounded,
                           color: Colors.white,
                         ),
-                        tooltip: 'Volver',
+                        tooltip: tr('Volver'),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -122,8 +123,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    const Text(
-                      'Recuperar contraseña',
+                    Text(
+                      tr('Recuperar contraseña'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -132,8 +133,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 9),
-                    const Text(
-                      'Recupera el acceso a tu cuenta VESTA',
+                    Text(
+                      tr('Recupera el acceso a tu cuenta VESTA'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white70,
@@ -160,8 +161,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            'Restablecer acceso',
+                          Text(
+                            tr('Restablecer acceso'),
                             style: TextStyle(
                               color: _dark,
                               fontSize: 20,
@@ -169,8 +170,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           ),
                           const SizedBox(height: 9),
-                          const Text(
-                            'Introduce el correo electrónico asociado a tu cuenta. Te enviaremos las instrucciones para restablecer tu contraseña.',
+                          Text(
+                            tr('Introduce el correo electrónico asociado a tu cuenta. Te enviaremos las instrucciones para restablecer tu contraseña.'),
                             style: TextStyle(
                               color: _muted,
                               fontSize: 12,
@@ -178,8 +179,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           ),
                           const SizedBox(height: 25),
-                          const Text(
-                            'Correo electrónico',
+                          Text(
+                            tr('Correo electrónico'),
                             style: TextStyle(
                               color: _dark,
                               fontSize: 12,
@@ -272,7 +273,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Row(
+                                    : Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
@@ -283,7 +284,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           ),
                                           SizedBox(width: 10),
                                           Text(
-                                            'Enviar instrucciones',
+                                            tr('Enviar instrucciones'),
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w700,
@@ -299,11 +300,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 25),
-                    const Text(
-                      'VESTA · Seguridad y tranquilidad',
+                    Text(
+                      tr('VESTA · Seguridad y tranquilidad'),
                       style: TextStyle(
                         color: Colors.white60,
-                        fontSize: 11,
+                        fontSize: 12,
                         letterSpacing: 0.7,
                       ),
                     ),

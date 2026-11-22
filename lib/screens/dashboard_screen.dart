@@ -2,30 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:vesta_app/services/api_client.dart';
-import 'package:vesta_app/services/auth_service.dart';
+import 'package:vesta_app/services/child_profile_service.dart';
+import 'package:vesta_app/widgets/pairing_card.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   Future<void> _desvincularHijo(
     BuildContext context,
     String hijoId,
+    String nombre,
   ) async {
+    // Previously one accidental tap on the icon was enough to unlink.
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(tr('¿Desvincular el dispositivo de {0}?', [nombre])),
+        content: Text(
+          tr('Dejarás de recibir su ubicación, alertas y reportes, y se desactivarán los filtros en su teléfono. El perfil se conserva y podrás vincularlo de nuevo con un código nuevo.'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(tr('Cancelar')),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: VestaTheme.wine),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(tr('Desvincular')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true || !context.mounted) return;
+
     try {
-      final data = await VestaApiClient.post(
-        '/api/children/${Uri.encodeComponent(hijoId)}/unlink',
-      );
-      final codigo = data['pairingCode'] as String? ?? '';
+      await ChildProfileService.unlink(hijoId);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              codigo.isEmpty
-                  ? 'Menor desvinculado correctamente.'
-                  : 'Dispositivo desvinculado. Nuevo código: $codigo',
+              tr('Dispositivo desvinculado. Toca el perfil para ver el nuevo QR.'),
             ),
           ),
         );
@@ -34,10 +55,23 @@ class DashboardScreen extends StatelessWidget {
       debugPrint('Error al desvincular: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al desvincular: $e')),
+          SnackBar(content: Text(tr('Error al desvincular: {0}', [e]))),
         );
       }
     }
+  }
+
+  void _editarPerfil(
+    BuildContext context,
+    String hijoId,
+    Map<String, dynamic> hijo,
+  ) {
+    context.push('/add-child', extra: {
+      'childId': hijoId,
+      'nombre': hijo['nombre'],
+      'edad': hijo['edad'],
+      'color': hijo['color'],
+    });
   }
 
   @override
@@ -47,10 +81,10 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: VestaTheme.background,
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           children: [
             Text(
-              'PANEL DE CONTROL',
+              tr('PANEL DE CONTROL'),
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
@@ -59,9 +93,9 @@ class DashboardScreen extends StatelessWidget {
             ),
             SizedBox(height: 3),
             Text(
-              'VESTA · PROTECCIÓN FAMILIAR',
+              tr('VESTA · PROTECCIÓN FAMILIAR'),
               style: TextStyle(
-                fontSize: 9,
+                fontSize: 12,
                 letterSpacing: 1.5,
                 color: VestaTheme.textSecondary,
               ),
@@ -70,21 +104,16 @@ class DashboardScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            tooltip: 'Privacidad y autorizaciones',
-            onPressed: () => context.push('/privacy'),
-            icon: const Icon(Icons.privacy_tip_outlined),
-          ),
-          IconButton(
-            tooltip: 'Cerrar sesión',
-            onPressed: () => AuthService().signOut(),
-            icon: const Icon(Icons.logout_rounded),
+            tooltip: tr('Ajustes'),
+            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.settings_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: user == null
-          ? const Center(
-              child: Text('Inicia sesión para continuar'),
+          ? Center(
+              child: Text(tr('Inicia sesión para continuar')),
             )
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -101,8 +130,8 @@ class DashboardScreen extends StatelessWidget {
                 }
 
                 if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('No se pudieron cargar los dispositivos.'),
+                  return Center(
+                    child: Text(tr('No se pudieron cargar los dispositivos.')),
                   );
                 }
 
@@ -123,12 +152,12 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(height: 26),
                     Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'DISPOSITIVOS FAMILIARES',
+                            tr('DISPOSITIVOS FAMILIARES'),
                             style: TextStyle(
                               color: VestaTheme.textSecondary,
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.5,
                             ),
@@ -159,8 +188,8 @@ class DashboardScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 8,
         icon: const Icon(Icons.add_rounded),
-        label: const Text(
-          'Añadir dispositivo',
+        label: Text(
+          tr('Añadir dispositivo'),
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -190,8 +219,8 @@ class DashboardScreen extends StatelessWidget {
             size: 32,
           ),
           const SizedBox(height: 17),
-          const Text(
-            'Tu familia, protegida.',
+          Text(
+            tr('Tu familia, protegida.'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -200,7 +229,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 7),
           Text(
-            'Gestiona los dispositivos vinculados a tu cuenta.',
+            tr('Gestiona los dispositivos vinculados a tu cuenta.'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
               fontSize: 12,
@@ -209,9 +238,9 @@ class DashboardScreen extends StatelessWidget {
           const SizedBox(height: 22),
           Row(
             children: [
-              _welcomeStat('DISPOSITIVOS', '$total'),
+              _welcomeStat(tr('DISPOSITIVOS'), '$total'),
               const SizedBox(width: 28),
-              _welcomeStat('VINCULADOS', '$vinculados'),
+              _welcomeStat(tr('VINCULADOS'), '$vinculados'),
             ],
           ),
         ],
@@ -235,7 +264,7 @@ class DashboardScreen extends StatelessWidget {
           label,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.75),
-            fontSize: 9,
+            fontSize: 12,
             fontWeight: FontWeight.w700,
             letterSpacing: 1,
           ),
@@ -256,9 +285,9 @@ class DashboardScreen extends StatelessWidget {
       ),
       child: Text(
         '$total registrados',
-        style: const TextStyle(
+        style: TextStyle(
           color: VestaTheme.textSecondary,
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -271,7 +300,13 @@ class DashboardScreen extends StatelessWidget {
     String hijoId,
   ) {
     final bool estaVinculado = hijo['status'] == 'vinculado';
-    final String nombre = hijo['nombre'] ?? 'Sin nombre';
+    final String nombre = (hijo['nombre'] ?? tr('Sin nombre')).toString();
+    final int? colorValue = hijo['color'] is int ? hijo['color'] as int : null;
+    final Color avatarColor =
+        colorValue == null ? VestaTheme.rose : Color(colorValue);
+    final String inicial =
+        nombre.trim().isEmpty ? '?' : nombre.trim()[0].toUpperCase();
+    final edad = hijo['edad'];
 
     return Container(
       decoration: BoxDecoration(
@@ -297,50 +332,66 @@ class DashboardScreen extends StatelessWidget {
             if (estaVinculado) {
               context.go('/home/$hijoId', extra: nombre);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('El menor aún no está vinculado.'),
-                ),
+              showPairingSheet(
+                context,
+                childId: hijoId,
+                childName: nombre,
+                pairingCode: hijo['pairingCode']?.toString() ?? '',
+                expiresAt: pairingExpiryOf(hijo),
               );
             }
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 6, 16),
             child: Row(
               children: [
-                Container(
-                  width: 49,
-                  height: 49,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: estaVinculado
-                          ? [
-                              VestaTheme.wine,
-                              VestaTheme.rose,
-                            ]
-                          : [
-                              VestaTheme.surfaceLight,
-                              VestaTheme.burgundy,
-                            ],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (estaVinculado
-                                ? VestaTheme.rose
-                                : VestaTheme.beige)
-                            .withValues(alpha: 0.18),
-                        blurRadius: 12,
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: avatarColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: avatarColor.withValues(alpha: 0.35),
+                            blurRadius: 12,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    estaVinculado
-                        ? Icons.phonelink_ring_rounded
-                        : Icons.phonelink_setup_rounded,
-                    color: Colors.white,
-                    size: 23,
-                  ),
+                      child: Text(
+                        inicial,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: -4,
+                      bottom: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: VestaTheme.surface,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          estaVinculado
+                              ? Icons.phonelink_ring_rounded
+                              : Icons.qr_code_rounded,
+                          size: 15,
+                          color: estaVinculado
+                              ? const Color(0xFF72D6A0)
+                              : VestaTheme.beige,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -348,10 +399,10 @@ class DashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        nombre,
+                        edad is int ? tr('{0} · {1} años', [nombre, edad]) : nombre,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: VestaTheme.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -360,44 +411,72 @@ class DashboardScreen extends StatelessWidget {
                       const SizedBox(height: 7),
                       _statusLabel(estaVinculado),
                       if (!estaVinculado) ...[
-                        const SizedBox(height: 9),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: VestaTheme.burgundy.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: Text(
-                            'CÓDIGO  ${hijo['pairingCode'] ?? 'N/A'}',
-                            style: const TextStyle(
-                              color: VestaTheme.beige,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1,
-                            ),
+                        const SizedBox(height: 6),
+                        Text(
+                          tr('Toca para ver el código QR'),
+                          style: TextStyle(
+                            color: VestaTheme.textSecondary,
+                            fontSize: 12,
                           ),
                         ),
                       ],
                     ],
                   ),
                 ),
-                if (estaVinculado)
-                  IconButton(
-                    tooltip: 'Desvincular dispositivo',
-                    onPressed: () => _desvincularHijo(context, hijoId),
-                    icon: const Icon(
-                      Icons.link_off_rounded,
-                      color: VestaTheme.rose,
-                    ),
-                  )
-                else
-                  const Icon(
-                    Icons.chevron_right_rounded,
+                PopupMenuButton<String>(
+                  tooltip: tr('Opciones'),
+                  icon: Icon(
+                    Icons.more_vert_rounded,
                     color: VestaTheme.textSecondary,
                   ),
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'edit':
+                        _editarPerfil(context, hijoId, hijo);
+                      case 'qr':
+                        showPairingSheet(
+                          context,
+                          childId: hijoId,
+                          childName: nombre,
+                          pairingCode: hijo['pairingCode']?.toString() ?? '',
+                expiresAt: pairingExpiryOf(hijo),
+                        );
+                      case 'unlink':
+                        _desvincularHijo(context, hijoId, nombre);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: ListTile(
+                        leading: Icon(Icons.edit_rounded),
+                        title: Text(tr('Editar perfil')),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    if (!estaVinculado)
+                      PopupMenuItem(
+                        value: 'qr',
+                        child: ListTile(
+                          leading: Icon(Icons.qr_code_rounded),
+                          title: Text(tr('Código de vinculación')),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    if (estaVinculado)
+                      PopupMenuItem(
+                        value: 'unlink',
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.link_off_rounded,
+                            color: VestaTheme.rose,
+                          ),
+                          title: Text(tr('Desvincular dispositivo')),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -427,10 +506,10 @@ class DashboardScreen extends StatelessWidget {
         ),
         const SizedBox(width: 7),
         Text(
-          vinculado ? 'Dispositivo vinculado' : 'Esperando vinculación',
+          vinculado ? tr('Dispositivo vinculado') : tr('Esperando vinculación'),
           style: TextStyle(
             color: color,
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -465,8 +544,8 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 23),
-            const Text(
-              'Aún no hay dispositivos',
+            Text(
+              tr('Aún no hay dispositivos'),
               style: TextStyle(
                 color: VestaTheme.textPrimary,
                 fontSize: 19,
@@ -474,8 +553,8 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 9),
-            const Text(
-              'Añade un dispositivo para comenzar a gestionar la protección familiar.',
+            Text(
+              tr('Añade un dispositivo para comenzar a gestionar la protección familiar.'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: VestaTheme.textSecondary,
@@ -487,7 +566,7 @@ class DashboardScreen extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => context.go('/add-child'),
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Añadir dispositivo'),
+              label: Text(tr('Añadir dispositivo')),
             ),
           ],
         ),

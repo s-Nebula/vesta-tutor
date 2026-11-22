@@ -4,6 +4,7 @@ import 'package:vesta_app/core/utils/validators.dart';
 import 'package:vesta_app/services/auth_service.dart';
 import 'package:vesta_app/widgets/vesta_header.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -37,12 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackbar('Por favor, rellena todos los campos.');
+      _showSnackbar(tr('Por favor, rellena todos los campos.'));
       return;
     }
 
     if (!Validators.isValidEmail(email)) {
-      _showSnackbar('Introduce un correo electrónico válido.');
+      _showSnackbar(tr('Introduce un correo electrónico válido.'));
       return;
     }
 
@@ -150,8 +151,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            '¡Bienvenido!',
+                          Text(
+                            tr('¡Bienvenido!'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: _dark,
@@ -161,8 +162,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'Inicia sesión para continuar con Vesta',
+                          Text(
+                            tr('Inicia sesión para continuar con Vesta'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: _muted,
@@ -171,22 +172,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 30),
                           _buildInputField(
-                            label: 'Correo electrónico',
+                            label: tr('Correo electrónico'),
                             controller: identifierController,
                             type: TextInputType.emailAddress,
                             icon: Icons.mail_outline_rounded,
                           ),
                           const SizedBox(height: 18),
                           _buildInputField(
-                            label: 'Contraseña',
+                            label: tr('Contraseña'),
                             controller: passwordController,
                             type: TextInputType.visiblePassword,
                             icon: Icons.lock_outline_rounded,
                             obscureText: _obscurePassword,
                             suffix: IconButton(
                               tooltip: _obscurePassword
-                                  ? 'Mostrar contraseña'
-                                  : 'Ocultar contraseña',
+                                  ? tr('Mostrar contraseña')
+                                  : tr('Ocultar contraseña'),
                               onPressed: () {
                                 setState(() {
                                   _obscurePassword = !_obscurePassword;
@@ -207,8 +208,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: _isLoading
                                   ? null
                                   : () => context.push('/forgot-password'),
-                              child: const Text(
-                                '¿Olvidaste tu contraseña?',
+                              child: Text(
+                                tr('¿Olvidaste tu contraseña?'),
                                 style: TextStyle(
                                   color: _wine,
                                   fontWeight: FontWeight.w600,
@@ -255,8 +256,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Text(
-                                        'Iniciar sesión',
+                                    : Text(
+                                        tr('Iniciar sesión'),
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -273,10 +274,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: _muted.withValues(alpha: 0.30),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                 child: Text(
-                                  'O continúa con',
+                                  tr('O continúa con'),
                                   style: TextStyle(
                                     color: _muted,
                                     fontSize: 12,
@@ -306,9 +307,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Flexible(
+                              Flexible(
                                 child: Text(
-                                  '¿Nuevo usuario?',
+                                  tr('¿Nuevo usuario?'),
                                   style: TextStyle(
                                     color: _muted,
                                     fontSize: 13,
@@ -319,8 +320,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: _isLoading
                                     ? null
                                     : () => context.push('/register'),
-                                child: const Text(
-                                  'Crear cuenta',
+                                child: Text(
+                                  tr('Crear cuenta'),
                                   style: TextStyle(
                                     color: _wine,
                                     fontWeight: FontWeight.bold,
@@ -334,12 +335,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    const Text(
-                      'VESTA  ·  PROTECCIÓN Y TRANQUILIDAD',
+                    Text(
+                      tr('VESTA  ·  PROTECCIÓN Y TRANQUILIDAD'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Color(0xFFD6B7A6),
-                        fontSize: 10,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.5,
                       ),
@@ -444,7 +445,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Image.asset(assetPath, width: 19, height: 19),
             const SizedBox(width: 11),
             Text(
-              'Continuar con $text',
+              tr('Continuar con {0}', [text]),
               style: const TextStyle(
                 color: _dark,
                 fontWeight: FontWeight.w600,

@@ -1,7 +1,7 @@
 name: vesta_app
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -30,6 +30,8 @@ dependencies:
   fl_chart: ^1.2.0
   pdf: ^3.11.3
   printing: ^5.14.3
+  qr_flutter: ^4.1.0
+  connectivity_plus: ^7.3.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
@@ -43,6 +45,9 @@ flutter:
     - assets/legal/terminos_y_condiciones.txt
     - assets/legal/politica_privacidad.txt
     - assets/legal/guia_usuario.txt
+    - assets/legal/en/terms_and_conditions.txt
+    - assets/legal/en/privacy_policy.txt
+    - assets/legal/en/user_guide.txt
     - assets/brand/vesta_logo.png
     - assets/brand/vesta_simbolo.png
     - assets/google.png

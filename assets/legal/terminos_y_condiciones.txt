@@ -4,11 +4,11 @@ Términos y condiciones de uso
 
 Condiciones que regulan el acceso, la instalación y el uso de Vesta Padre, Vesta Tracker y los servicios relacionados.
 
-Versión | 1.0
+Versión | 1.1
 
-Fecha de entrada en vigor | 20 de noviembre de 2026
+Fecha de entrada en vigor | 22 de noviembre de 2026
 
-Última actualización | 20 de noviembre de 2026
+Última actualización | 22 de noviembre de 2026
 
 Responsable del servicio | FORBIDDEN S.A.S. — NIT 901653270-2
 
@@ -18,7 +18,7 @@ Jurisdicción | República de Colombia
 
 FORBIDDEN S.A.S.
 
-NIT 901653270-2 · Cra. 66 # 46a - 128, Santa Marta, Magdalena, Colombia
+NIT 901653270-2 · Santa Marta, Magdalena, Colombia
 
 nebulagnu@proton.me · +57 324 616 7956
 
@@ -46,7 +46,7 @@ Contenido
 
 11. Desvinculación, terminación y eliminación
 
-12. Propiedad intelectual y código abierto
+12. Propiedad intelectual
 
 13. Servicios de terceros
 
@@ -71,7 +71,6 @@ NIT: 901653270-2
 Matrícula mercantil: 262746
 Cámara de Comercio: Santa Marta para el Magdalena
 Domicilio: Santa Marta, Magdalena, Colombia.
-Dirección: Cra. 66 # 46a - 128.
 Correo electrónico: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 
@@ -99,13 +98,13 @@ Vesta Tracker: permite recopilar y transmitir información autorizada del dispos
 
 Entre sus funciones se encuentran:
 
-Vinculación entre dispositivos.
+Vinculación entre dispositivos mediante código o código QR.
 
 Consulta de ubicación.
 
 Historial de ubicación disponible.
 
-Alertas relacionadas con batería, velocidad y bloqueos.
+Alertas relacionadas con batería, velocidad, bloqueos, zonas seguras, pérdida de conexión y desactivación de las protecciones.
 
 Supervisión agregada del uso de aplicaciones.
 
@@ -116,6 +115,22 @@ Filtrado de dominios mediante accesibilidad y VPN DNS.
 Administración de reglas de bloqueo y excepción.
 
 Gestión de privacidad y solicitudes relacionadas con datos personales.
+
+Zonas seguras con avisos de llegada y salida.
+
+Botón de emergencia (SOS) en Vesta Tracker.
+
+Modo estudio, con activación manual u horarios programados.
+
+Límites de tiempo diarios por aplicación.
+
+Solicitudes del menor al administrador para obtener permisos temporales.
+
+Búsqueda segura en buscadores compatibles y bloqueo de proveedores conocidos de DNS cifrado.
+
+Resumen semanal de actividad.
+
+Sección informativa para el menor sobre los datos que se comparten.
 
 La disponibilidad de cada función depende de la versión, compatibilidad del dispositivo, permisos, conectividad y configuración.
 
@@ -145,7 +160,7 @@ Proporcionar información veraz.
 
 Mantener la seguridad de sus credenciales.
 
-Proteger los códigos de vinculación.
+Proteger los códigos de vinculación y los códigos QR.
 
 Utilizar Vesta exclusivamente para fines legítimos.
 
@@ -164,6 +179,10 @@ No utilizar los datos obtenidos para acosar, discriminar, amenazar o perjudicar 
 Atender las solicitudes y derechos del menor.
 
 Mantener actualizadas las aplicaciones cuando existan versiones de seguridad.
+
+Configurar el modo estudio, los límites de tiempo y las zonas seguras de forma proporcionada a la edad y a las necesidades del menor.
+
+Atender de forma razonable las solicitudes que el menor envíe desde Vesta Tracker.
 
 El administrador es responsable de las decisiones que adopte a partir de los datos y alertas presentados por Vesta.
 
@@ -187,13 +206,15 @@ El usuario comprende que:
 
 La ubicación puede necesitar acceso preciso y en segundo plano.
 
-Las estadísticas de uso requieren autorización específica.
+Las estadísticas de uso requieren autorización específica y también se utilizan para aplicar los límites de tiempo diarios.
 
 La accesibilidad permite detectar eventos de ventanas y consultar información de la barra de direcciones del navegador compatible.
 
 La VPN local permite procesar consultas DNS para aplicar filtros.
 
 Las notificaciones y servicios en primer plano permiten informar sobre funciones activas.
+
+La cámara se utiliza en Vesta Tracker únicamente para leer el código QR de vinculación. Las imágenes no se almacenan ni se transmiten.
 
 La revocación de permisos puede impedir o limitar el funcionamiento de las funciones asociadas.
 
@@ -223,7 +244,17 @@ La ubicación y los informes pueden retrasarse por falta de batería, señal GPS
 
 El filtrado DNS puede no detectar tráfico que utilice mecanismos alternativos de resolución, DNS cifrado, aplicaciones con conexiones directas u otros métodos que no pasen por el mecanismo de filtrado.
 
-Vesta no es un servicio de respuesta a emergencias, localización policial ni sustituto de servicios médicos, de seguridad o protección infantil.
+El bloqueo de proveedores de DNS cifrado se limita a los proveedores conocidos por Vesta y puede no impedir otros mecanismos de resolución.
+
+La búsqueda segura solo se aplica a los buscadores y servicios compatibles, y depende de la configuración de cada proveedor.
+
+Los avisos de zonas seguras dependen de la precisión del GPS y de la conectividad: pueden retrasarse, producirse fuera del borde exacto de la zona o no producirse.
+
+El modo estudio y los límites de tiempo no bloquean las llamadas, los mensajes SMS, los ajustes del sistema ni el teclado, y pueden verse afectados si se desactiva el servicio de accesibilidad.
+
+Cuando el dispositivo no tiene conexión, Vesta Tracker mantiene durante un tiempo limitado las últimas reglas recibidas y envía los datos pendientes al recuperar la conexión.
+
+Vesta no es un servicio de respuesta a emergencias, localización policial ni sustituto de servicios médicos, de seguridad o protección infantil. El botón SOS envía un aviso a los administradores cuando hay conexión, pero no contacta con los servicios de emergencia. En una emergencia se debe llamar a la línea 123 o al servicio de emergencias que corresponda.
 
 9. Uso prohibido
 
@@ -241,7 +272,7 @@ Intentar vulnerar los sistemas de Vesta o de terceros.
 
 Interferir con la disponibilidad del servicio.
 
-Distribuir versiones modificadas con fines maliciosos.
+Copiar, modificar, descompilar, desensamblar, redistribuir o crear obras derivadas de las aplicaciones sin autorización escrita, salvo en la medida en que la ley lo permita expresamente.
 
 Suplantar identidades.
 
@@ -263,6 +294,8 @@ La Empresa podrá adoptar medidas técnicas razonables para proteger las cuentas
 
 El administrador podrá desvincular un dispositivo cuando la función esté disponible.
 
+Los códigos de vinculación y los códigos QR caducan a las 24 horas. El administrador puede generar uno nuevo en cualquier momento, lo que invalida el anterior.
+
 La desvinculación impide mantener la asociación activa, pero no implica por sí sola la eliminación de los datos históricos.
 
 El usuario podrá solicitar la supresión de los datos personales conforme a la Política de Privacidad, siempre que no exista una obligación legal o una excepción que justifique su conservación.
@@ -279,17 +312,23 @@ Alertas.
 
 Reglas de protección.
 
+Zonas seguras, configuración del modo estudio y límites de tiempo.
+
+Solicitudes del menor y resúmenes semanales.
+
 Registros de dispositivos.
 
 Datos asociados a la cuenta.
 
 Las copias de respaldo se eliminarán conforme al ciclo de conservación establecido, salvo obligaciones legales o necesidades legítimas de seguridad.
 
-12. Propiedad intelectual y código abierto
+12. Propiedad intelectual
 
-Los derechos sobre Vesta, sus marcas, diseños, documentación y componentes pertenecen a sus respectivos titulares.
+Vesta, sus aplicaciones, su código fuente, sus marcas, diseños y documentación son propiedad de FORBIDDEN S.A.S. o se utilizan con autorización de sus titulares. Todos los derechos están reservados.
 
-Los componentes distribuidos bajo licencias de código abierto se rigen por sus licencias específicas. Nada en estos Términos elimina los derechos concedidos por dichas licencias.
+FORBIDDEN S.A.S. concede al usuario una licencia de uso limitada, personal, no exclusiva, intransferible y revocable para instalar y utilizar las aplicaciones conforme a estos Términos. Esta licencia no transfiere ningún derecho de propiedad sobre el software.
+
+Vesta incorpora componentes de terceros que se rigen por sus propias licencias. Nada en estos Términos limita los derechos que esas licencias conceden sobre dichos componentes.
 
 La marca Vesta Security y los elementos identificativos de FORBIDDEN S.A.S. no podrán utilizarse para sugerir una afiliación o respaldo oficial sin autorización.
 
@@ -337,6 +376,8 @@ La versión vigente está disponible para consulta en las aplicaciones y en el s
 
 Cuando los cambios requieran una nueva aceptación o autorización, esta se solicitará antes de aplicar el tratamiento correspondiente.
 
+La versión 1.1 incorpora las funciones de vinculación por QR, zonas seguras, botón SOS, modo estudio, límites de tiempo, solicitudes del menor, búsqueda segura, bloqueo de DNS cifrado y resumen semanal.
+
 18. Legislación aplicable
 
 Estos Términos se interpretarán conforme a las leyes de la República de Colombia.
@@ -349,10 +390,9 @@ FORBIDDEN S.A.S.
 NIT: 901653270-2
 Proyecto: Vesta Security
 Domicilio: Santa Marta, Magdalena, Colombia.
-Dirección: Cra. 66 # 46a - 128.
 Correo: nebulagnu@proton.me
 Teléfono: +57 324 616 7956.
 
 Al utilizar Vesta, el usuario reconoce que ha tenido la oportunidad de consultar estos Términos y la Política de Privacidad.
 
-© 2026 Vesta Security · FORBIDDEN S.A.S.. Documento oficial, versión 1.0. La versión vigente se publica en las aplicaciones y en el sitio web de Vesta.
+© 2026 Vesta Security · FORBIDDEN S.A.S.. Documento oficial, versión 1.1. La versión vigente se publica en las aplicaciones y en el sitio web de Vesta.

@@ -1,0 +1,548 @@
+VESTA SECURITY
+
+User Guide
+
+How to install, link and use Vesta Parent and Vesta Tracker responsibly.
+
+Courtesy translation. The Spanish version is the official text and prevails in case of any discrepancy.
+
+Version | 1.1
+
+Publication date | 22 November 2026
+
+Last updated | 22 November 2026
+
+Service provider | FORBIDDEN S.A.S.
+
+Project author | Nebula
+
+Contact | nebulagnu@proton.me
+
+Jurisdiction | Republic of Colombia
+
+FORBIDDEN S.A.S.
+
+Tax ID (NIT) 901653270-2 · Santa Marta, Magdalena, Colombia
+
+nebulagnu@proton.me · +57 324 616 7956
+
+Contents
+
+1. Welcome to Vesta
+
+2. Requirements
+
+3. Installation
+
+4. Linking the devices
+
+5. Permissions and how they work
+
+6. Vesta Parent dashboard
+
+7. Vesta Tracker on the minor's phone
+
+8. How to set up rules
+
+9. Unlinking a device
+
+10. Privacy and rights
+
+11. Troubleshooting
+
+12. Responsible use
+
+13. Contact and support
+
+1. Welcome to Vesta
+
+Vesta Security is a family digital supervision and protection platform made up of two independent Android apps:
+
+Vesta Parent: the app the parent or legal representative uses to manage profiles, set protection rules and view information from the linked device.
+
+Vesta Tracker: the app installed on the minor's device, which sends authorised information and applies the protection rules that have been set.
+
+Vesta is designed to support responsible supervision of the digital environment of children and adolescents.
+
+It must be used with respect for the minor's privacy, dignity, developing autonomy and fundamental rights.
+
+Vesta does not replace family support, digital education or emergency services.
+
+2. Requirements
+
+To use Vesta you need:
+
+Two compatible Android devices.
+
+An Internet connection.
+
+A user account for Vesta Parent.
+
+Vesta Tracker installed on the device to be supervised.
+
+Location and background operation permissions.
+
+Usage access permission, if you want to use that feature.
+
+Accessibility permission, needed to block apps and detect domains in the compatible browser.
+
+A camera on the minor's device, only if you want to link it by scanning the QR code (optional).
+
+Authorisation from the legal representative for processing the minor's personal data, and the minor's participation according to their age, maturity and understanding.
+
+Feature availability may vary depending on the Android version, the manufacturer and device restrictions.
+
+3. Installation
+
+3.1. Vesta Parent
+
+Download Vesta Parent from the official distribution channel.
+
+Install the app on the parent's or guardian's device.
+
+Open Vesta Parent.
+
+Create an account or sign in.
+
+Read and accept the current legal documents.
+
+Fill in the requested information.
+
+Available sign-in methods may include email and password, Google and GitHub, depending on the version distributed.
+
+3.2. Vesta Tracker
+
+Download Vesta Tracker from the official channel.
+
+Install it on the device to be supervised.
+
+Open the app.
+
+Read the information about permissions and data processing.
+
+Complete the linking process.
+
+Grant the permissions you have authorised for the selected features.
+
+Do not install Vesta Tracker on a device without informing its user and without the legally required authority and authorisations.
+
+4. Linking the devices
+
+Linking connects Vesta Parent with Vesta Tracker.
+
+From Vesta Parent
+
+Sign in.
+
+Create a profile for the minor.
+
+Enter the requested information.
+
+When you save the profile, Vesta Parent shows a QR code and a 10-character code.
+
+Keep the screen open while you complete the process in Tracker. If you close it, tap the profile on the dashboard to see the code again.
+
+From Vesta Tracker
+
+Open Vesta Tracker.
+
+Tap “Scan QR code” and point the camera at the code, or type the 10-character code.
+
+Complete the device authentication.
+
+Accept the required permissions.
+
+Wait for the linking confirmation.
+
+Linking codes can be used only once and expire after 24 hours. If a code expires or you think someone else has seen it, tap “New code”: the previous one stops working. Do not share codes with unauthorised people.
+
+Once the process is complete, Vesta Parent can view the available information from the linked device.
+
+5. Permissions and how they work
+
+Android requires specific permissions for certain features. Vesta explains their purpose before requesting them.
+
+5.1. Location
+
+The location permission lets Tracker obtain the device's geographic coordinates and send them to Vesta so that the authorised administrator can see its location.
+
+The feature may require:
+
+Precise location.
+
+Background location access.
+
+A foreground location service.
+
+An Internet connection.
+
+The app may keep collecting location while running in the background if the user grants the corresponding permissions.
+
+The update frequency depends on GPS, Android, the manufacturer, battery, connectivity and other conditions. Vesta does not guarantee exact updates or continuous availability.
+
+5.2. Usage access
+
+This permission lets Vesta collect app usage statistics, such as:
+
+Apps used.
+
+Foreground usage time.
+
+Number of times opened.
+
+Total screen time.
+
+Report date.
+
+The information is used to show summaries of digital activity.
+
+It is also used to apply daily time limits: Vesta Tracker calculates on the phone itself how much each limited app has been used.
+
+5.3. Accessibility
+
+The accessibility service detects when an app configured as blocked is opened and, in the compatible browser, identifies the domain being visited.
+
+The permission may allow Android to expose information about active windows. Vesta uses that access only for the features described in its Privacy Policy.
+
+This permission must not be understood as authorisation to collect messages, passwords, photographs or the general content of other apps indiscriminately.
+
+5.4. Local VPN for DNS filtering
+
+Vesta Tracker may use the Android VPN service to process DNS queries and apply domain blocking rules.
+
+This VPN is used for local filtering. It is not an anonymisation service or a commercial VPN for hiding your IP address.
+
+Allowed DNS queries are forwarded to the DNS server available on the device's network. Queries for blocked domains receive an error response.
+
+If the administrator turns on safe search, the VPN sends Google, Bing, DuckDuckGo and YouTube to their content-filtered versions, and blocks known encrypted DNS providers so that the filter cannot be bypassed from the browser.
+
+5.5. Notifications and background operation
+
+Android may ask for permission to show notifications and keep services running in the foreground.
+
+These notifications show that certain Vesta features are active, such as tracking or DNS protection.
+
+When Vesta blocks an app, Vesta Tracker may show a notice with the option to ask the administrator for permission.
+
+5.6. Camera
+
+Vesta Tracker only uses the camera to read the linking QR code. It does not store or send images. If you do not grant the permission, you can type the code by hand.
+
+6. Vesta Parent dashboard
+
+From Vesta Parent, the administrator can use the features enabled in the installed version.
+
+Profiles
+
+Lets you view and manage the profiles linked to the authorised account.
+
+From the ⋮ menu of each profile you can edit the name, age and colour, see the linking QR code or unlink the device.
+
+Location
+
+Lets you see the last location received from the device and the available history.
+
+The location may appear out of date if the device is off, out of battery, without GPS signal, without Internet, or if Android restricts background activity.
+
+Alerts
+
+Alerts report relevant events, including:
+
+Low battery.
+
+Speed above the configured threshold.
+
+Attempts to open blocked apps.
+
+Attempts to access blocked domains.
+
+Arrivals at and departures from safe zones.
+
+Emergency (SOS) alerts.
+
+Device offline for a long time.
+
+App blocking, the web filter or location being turned off.
+
+Daily time used up and attempts to use apps during study mode.
+
+Alerts may show the date, time, event type and related technical data.
+
+Alerts arrive as notifications on the administrator's phone even when Vesta Parent is closed. In Settings you can choose to receive only critical alerts instantly; SOS alerts always come through.
+
+In the Alerts tab you can filter alerts by severity, swipe an alert to delete it or clear the list. Alerts with a location, such as zone or SOS alerts, include a “View on map” button.
+
+The administrator can delete individual alerts from the available interface. Deleting an alert does not delete the location history, usage reports or any other data.
+
+Protection rules
+
+The administrator can set blocking rules for apps and domains, as well as exceptions for allowed domains when the feature is available.
+
+Rules are applied on the Tracker device when it receives and processes the configuration.
+
+Effectiveness depends on operating system and browser compatibility, connectivity and Android's technical limitations.
+
+Study mode
+
+While it is active, the minor's phone can only open the apps you choose, plus the phone, messages, settings and keyboard. You can turn it on for 30 minutes, 1 hour, 2 hours or with no limit, or schedule times that repeat every week, including overnight.
+
+It works even when the minor's phone is offline.
+
+Safe zones
+
+Mark places such as home or school on the map and choose whether you want a notice on arrival, on departure or both. Zones are shown in green on the location map.
+
+Time limits
+
+Give each app a maximum daily usage time. When it runs out, the app is blocked until the next day. The screen shows how much each app has been used today.
+
+Requests
+
+The minor can ask you from Vesta Tracker for permission to use an app or for more time. You will get a notification and can approve the request, choosing how many minutes to grant, or reject it. While the permission lasts, the app works even if it is blocked, in study mode or out of daily time.
+
+Web protection
+
+In Filters you can turn on safe search and encrypted DNS blocking, and apply with one tap the filters recommended for the minor's age. The recommendations are added to the block list and you can remove them whenever you like.
+
+Weekly summary
+
+Every Sunday evening you receive a summary with the average screen time, the most used apps and the week's alerts. It also appears in the Reports tab.
+
+Settings
+
+From the settings icon on the dashboard you can choose the light, dark or system theme, set up notifications, review privacy and authorisations, and sign out.
+
+7. Vesta Tracker on the minor's phone
+
+Vesta Tracker offers the minor several features of its own.
+
+Emergency (SOS) button
+
+By pressing and holding the “Emergency” button, the minor sends an alert to their administrators with their location, if location is authorised. If there is no connection, the alert is sent once it is restored. The SOS button does not contact emergency services: in an emergency, call 123.
+
+Ask for permission
+
+From “Ask for permission”, or by tapping the notice shown when an app is blocked, the minor chooses the app and the time and can write a message. On the same screen they can see whether their request is pending, approved or rejected.
+
+What Vesta shares
+
+This section explains to the minor, in plain language, what information their administrators receive, what is not shared and which features are active at that moment.
+
+Working offline
+
+When offline, Vesta Tracker keeps the latest rules received for up to 24 hours and stores the data to send it once reconnected. If the phone goes more than 20 minutes without sending data, Vesta Parent receives an alert.
+
+8. How to set up rules
+
+Block an app
+
+Open the app management section.
+
+Select the app you want to restrict.
+
+Add the blocking rule.
+
+Save the changes.
+
+Wait for Tracker to receive the configuration.
+
+Block a domain
+
+Open the filters section.
+
+Enter the domain you want to restrict.
+
+Save the rule.
+
+Check that the Tracker device is connected.
+
+Domain rules may apply to the domain entered and its subdomains, depending on the matching mechanism implemented.
+
+Allow a domain
+
+Open the filters section.
+
+Add the domain to the allow list.
+
+Save the changes.
+
+Wait for it to sync.
+
+The most specific rule decides the result when matching block and allow rules exist. In a tie, the allow rule prevails.
+
+Apply age recommendations
+
+Open the profile's Filters tab.
+
+Tap “Apply age recommendations”.
+
+Review the list proposed for the minor's age.
+
+Tap “Apply”.
+
+Turn on safe search
+
+Open the profile's Filters tab.
+
+Turn on “Safe search”.
+
+Check that “Block encrypted DNS” is also on.
+
+Set up study mode
+
+On the profile screen, tap “Study mode”.
+
+Turn it on for a period or add a schedule.
+
+Select the apps allowed while studying.
+
+Set a daily limit
+
+On the profile screen, tap “Limits”.
+
+Choose the app.
+
+Select the maximum time per day.
+
+Create a safe zone
+
+On the profile screen, tap “Zones” and then “New zone”.
+
+Tap the map to set the centre and adjust the radius.
+
+Enter a name and choose the notices.
+
+Tap “Save”.
+
+Answer a request
+
+Tap the notification or open “Requests” on the profile screen.
+
+Tap “Approve” and choose the minutes, or tap “Reject”.
+
+9. Unlinking a device
+
+Unlinking separates the Tracker device from the corresponding profile.
+
+Before you do it, bear in mind that unlinking does not delete all historical data.
+
+To unlink, open the profile's ⋮ menu on the dashboard and choose “Unlink device”. Vesta asks for confirmation. Vesta Tracker detects the unlinking automatically, turns off its protections and returns to the linking screen.
+
+Stored information must be managed through the privacy and deletion controls available in the corresponding version.
+
+To link the device again, tap the profile on the dashboard: a new QR code will be shown.
+
+10. Privacy and rights
+
+FORBIDDEN S.A.S. is the controller of the personal data managed by Vesta.
+
+The user may request:
+
+Access to their data.
+
+Correction or update.
+
+Proof of authorisation.
+
+Information about how their data is used.
+
+Withdrawal of authorisation where appropriate.
+
+Deletion of data where legally appropriate.
+
+Requests must be sent to:
+
+Email: nebulagnu@proton.me
+
+Where data of minors is involved, requests must be submitted by the people legally entitled to do so, while also respecting the minor's rights.
+
+11. Troubleshooting
+
+Location does not appear
+
+Check that GPS is on.
+
+Review the location permissions.
+
+Check that Tracker is allowed to run in the background.
+
+Check the Internet connection.
+
+Check that the device has battery.
+
+Alerts are not updating
+
+Check connectivity.
+
+Check that the devices are still linked.
+
+Check that Tracker has the required permissions.
+
+Check that the rules are synced.
+
+Apps are not being blocked
+
+Check that the accessibility service is on.
+
+Check that the app is on the block list.
+
+Check that Tracker is not restricted by the manufacturer.
+
+Domains are not being blocked
+
+Check that the DNS VPN is active.
+
+Check the configured rules.
+
+Check that the browser supports domain detection.
+
+Bear in mind that encrypted DNS, alternative browsers and custom resolution mechanisms may limit the effectiveness of filtering.
+
+The service stops
+
+Some manufacturers apply aggressive battery restrictions. Review Android's battery and background operation settings.
+
+The linking code does not work
+
+Check that no more than 24 hours have passed since it was generated.
+
+Tap “New code” and scan it again.
+
+Check that the minor's phone has an Internet connection.
+
+Notifications are not arriving
+
+Check that Vesta Parent is allowed to show notifications.
+
+Check in Settings whether you chose to receive only critical alerts.
+
+Sign out and sign in again to register the phone again.
+
+Study mode or limits are not applied
+
+Check that the Vesta Tracker accessibility service is on.
+
+For limits, check that Tracker has usage access.
+
+Remember that the phone, messages, settings and keyboard are always available.
+
+“Offline” appears
+
+Vesta Parent shows the latest saved data and updates automatically once the connection is restored. Vesta Tracker keeps applying the latest rules received for up to 24 hours.
+
+12. Responsible use
+
+Vesta must be used for legitimate family protection and not for abusive surveillance, harassment, intimidation, control of third parties or unauthorised access to devices.
+
+The administrator must explain to the minor, in a way appropriate to their age, which features are active and what information is collected.
+
+13. Contact and support
+
+FORBIDDEN S.A.S.
+Project: Vesta Security
+Email: nebulagnu@proton.me
+Phone: +57 324 616 7956
+
+© 2026 Vesta Security. All rights reserved.
+
+© 2026 Vesta Security · FORBIDDEN S.A.S. Official document, version 1.1. This is a courtesy translation: in case of discrepancy, the Spanish version prevails. The current version is published in the apps and on the Vesta website.

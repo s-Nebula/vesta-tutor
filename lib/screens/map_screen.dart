@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../theme_notifier.dart';
+import 'package:vesta_app/screens/zones_screen.dart';
+import 'package:vesta_app/theme/vesta_theme.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class MapScreen extends StatefulWidget {
   final String childId;
   final String tutorId;
@@ -21,14 +22,31 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final MapController _mapController = MapController();
   LatLng _ultimaUbicacion = const LatLng(11.2404, -74.1990);
-  String _lastUpdate = "Esperando señal...";
+  String _lastUpdate = tr('Esperando señal...');
   bool _hayUbicacion = false;
+  bool _mapReady = false;
+  DateTime? _lastFix;
+  String? _error;
+  Timer? _staleTimer;
   StreamSubscription? _locationSubscription;
+
+  static const Duration _staleAfter = Duration(minutes: 15);
+
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _zonesStream =
+      FirebaseFirestore.instance
+          .collection('children')
+          .doc(widget.childId)
+          .collection('zones')
+          .snapshots();
 
   @override
   void initState() {
     super.initState();
     _iniciarEscuchaUbicacion();
+    // Refreshes the "old signal" notice even when no new data arrives.
+    _staleTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted && _lastFix != null) setState(() {});
+    });
   }
 
   Future<void> _abrirGoogleMaps() async {
@@ -51,13 +69,13 @@ class _MapScreenState extends State<MapScreen> {
 
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo abrir Google Maps')),
+          SnackBar(content: Text(tr('No se pudo abrir Google Maps'))),
         );
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al abrir Google Maps')),
+          SnackBar(content: Text(tr('Error al abrir Google Maps'))),
         );
       }
     }
@@ -69,103 +87,71 @@ class _MapScreenState extends State<MapScreen> {
         .doc(widget.childId)
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.exists && mounted) {
-        final data = snapshot.data();
-        final lat = data?['lat'] as num?;
-        final lng = data?['lng'] as num?;
-        final timestamp = data?['timestamp'] as Timestamp?;
+      if (!snapshot.exists || !mounted) return;
 
-        if (lat != null &&
-            lng != null &&
-            lat >= -90 &&
-            lat <= 90 &&
-            lng >= -180 &&
-            lng <= 180) {
-          final newPos = LatLng(lat.toDouble(), lng.toDouble());
+      final data = snapshot.data();
+      final lat = data?['lat'] as num?;
+      final lng = data?['lng'] as num?;
+      // Actual capture time (the device may send late if it was offline);
+      // otherwise the time it reached the server.
+      final captured = data?['capturedAt'];
+      final server = data?['timestamp'];
+      final fix = captured is Timestamp
+          ? captured.toDate()
+          : server is Timestamp
+              ? server.toDate()
+              : null;
 
-          setState(() {
-            _ultimaUbicacion = newPos;
-            _hayUbicacion = true;
-            if (timestamp != null) {
-              _lastUpdate = DateFormat('HH:mm:ss').format(timestamp.toDate());
-            } else {
-              _lastUpdate = DateFormat('HH:mm:ss').format(DateTime.now());
-            }
-          });
-
-          _mapController.move(newPos, 16.0);
-        }
+      if (lat == null ||
+          lng == null ||
+          lat < -90 ||
+          lat > 90 ||
+          lng < -180 ||
+          lng > 180) {
+        return;
       }
+
+      final newPos = LatLng(lat.toDouble(), lng.toDouble());
+
+      setState(() {
+        _error = null;
+        _ultimaUbicacion = newPos;
+        _hayUbicacion = true;
+        _lastFix = fix;
+        _lastUpdate = fix == null
+            ? tr('Sin hora')
+            : DateFormat('dd/MM HH:mm:ss').format(fix);
+      });
+
+      if (_mapReady) _mapController.move(newPos, _mapController.camera.zoom);
+    }, onError: (Object error) {
+      if (!mounted) return;
+      setState(() {
+        _error = tr('No se puede acceder a la ubicación. Comprueba que todos los tutores han autorizado la ubicación.');
+      });
     });
   }
 
-  void _mostrarModalTema(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Consumer<ThemeNotifier>(
-          builder: (context, themeNotifier, child) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Seleccionar Tema",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  RadioListTile<ThemeMode>(
-                    title: const Text("Tema Claro"),
-                    value: ThemeMode.light,
-                    groupValue: themeNotifier.themeMode,
-                    onChanged: (value) {
-                      themeNotifier.setTheme(value!);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  RadioListTile<ThemeMode>(
-                    title: const Text("Tema Oscuro"),
-                    value: ThemeMode.dark,
-                    groupValue: themeNotifier.themeMode,
-                    onChanged: (value) {
-                      themeNotifier.setTheme(value!);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  RadioListTile<ThemeMode>(
-                    title: const Text("Predeterminado del Sistema"),
-                    value: ThemeMode.system,
-                    groupValue: themeNotifier.themeMode,
-                    onChanged: (value) {
-                      themeNotifier.setTheme(value!);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+  bool get _isStale =>
+      _lastFix != null && DateTime.now().difference(_lastFix!) > _staleAfter;
+
+  String _staleMinutes() {
+    final diff = DateTime.now().difference(_lastFix!);
+    if (diff.inHours >= 1) return tr('{0} h {1} min', [diff.inHours, diff.inMinutes % 60]);
+    return '${diff.inMinutes} min';
   }
 
   @override
   void dispose() {
     _locationSubscription?.cancel();
+    _staleTimer?.cancel();
     _mapController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-
-    bool isDarkMode = themeNotifier.themeMode == ThemeMode.dark ||
-        (themeNotifier.themeMode == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    final isDarkMode = VestaTheme.isDark;
 
     const String tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -174,24 +160,26 @@ class _MapScreenState extends State<MapScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Rastreo en Tiempo Real",
+            Text(tr('Rastreo en Tiempo Real'),
                 style: TextStyle(fontSize: 16)),
-            Text("Última señal: $_lastUpdate",
-                style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            Text(tr('Última señal: {0}', [_lastUpdate]),
+                style: TextStyle(fontSize: 12, color: VestaTheme.textSecondary)),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: () => _mostrarModalTema(context),
-            tooltip: "Cambiar tema",
+            tooltip: tr('Zonas seguras'),
+            icon: const Icon(Icons.add_location_alt_rounded),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => ZonesScreen(childId: widget.childId),
+            )),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _hayUbicacion ? _abrirGoogleMaps : null,
         icon: const Icon(Icons.directions),
-        label: const Text('Cómo llegar'),
+        label: Text(tr('Cómo llegar')),
       ),
       body: Container(
         color: isDarkMode ? const Color(0xFF121212) : Colors.white,
@@ -200,17 +188,42 @@ class _MapScreenState extends State<MapScreen> {
           options: MapOptions(
             initialCenter: _ultimaUbicacion,
             initialZoom: 16.0,
+            onMapReady: () {
+              _mapReady = true;
+              if (_hayUbicacion) _mapController.move(_ultimaUbicacion, 16.0);
+            },
           ),
           children: [
             TileLayer(
               urlTemplate: tileUrl,
-              userAgentPackageName: 'org.vestaopensource.tracker',
+              userAgentPackageName: 'org.vestaopensource.tutor',
               retinaMode: MediaQuery.of(context).devicePixelRatio > 1.0,
               keepBuffer: 6,
               tileSize: 256,
               tileProvider: NetworkTileProvider(),
             ),
-            MarkerLayer(
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _zonesStream,
+              builder: (context, snapshot) {
+                final circles = <CircleMarker>[];
+                for (final doc in snapshot.data?.docs ?? const []) {
+                  final data = doc.data();
+                  final lat = data['lat'], lng = data['lng'], r = data['radius'];
+                  if (lat is num && lng is num && r is num) {
+                    circles.add(CircleMarker(
+                      point: LatLng(lat.toDouble(), lng.toDouble()),
+                      radius: r.toDouble(),
+                      useRadiusInMeter: true,
+                      color: VestaTheme.success.withValues(alpha: 0.12),
+                      borderColor: VestaTheme.success,
+                      borderStrokeWidth: 2,
+                    ));
+                  }
+                }
+                return CircleLayer(circles: circles);
+              },
+            ),
+            if (_hayUbicacion) MarkerLayer(
               markers: [
                 Marker(
                   point: _ultimaUbicacion,
@@ -218,15 +231,40 @@ class _MapScreenState extends State<MapScreen> {
                   height: 40,
                   child: const Icon(
                     Icons.person_pin_circle,
-                    color: Color(0xFFE03131),
+                    color: VestaTheme.rose,
                     size: 40,
                   ),
                 ),
               ],
             ),
+            if (_error != null || !_hayUbicacion || _isStale)
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _error != null
+                        ? const Color(0xFF792D43)
+                        : const Color(0xFF8A5A00),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    _error ??
+                        (!_hayUbicacion
+                            ? tr('Todavía no hay ninguna ubicación del dispositivo.')
+                            : tr('Última ubicación conocida hace {0}. El dispositivo puede estar sin conexión o con la ubicación desactivada.', [_staleMinutes()])),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
             RichAttributionWidget(
               attributions: [
-                TextSourceAttribution('© OpenStreetMap contributors'),
+                TextSourceAttribution(tr('© OpenStreetMap contributors')),
               ],
             ),
           ],

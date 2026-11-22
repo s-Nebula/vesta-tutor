@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../services/child_profile_service.dart';
 import '../services/database_service.dart';
+import '../widgets/pairing_card.dart';
 
+import 'package:vesta_app/l10n/tr.dart';
 class AddChildScreen extends StatefulWidget {
   final Map<String, dynamic>? childData;
 
@@ -25,8 +27,9 @@ class _AddChildScreenState extends State<AddChildScreen> {
 
   bool _isLoading = false;
   bool _isEditing = false;
+  String? _editingChildId;
 
-  final List<Color> _avatarColors = const [
+  final List<Color> _avatarColors = [
     Color(0xFF537FCB),
     Color(0xFFC15B68),
     Color(0xFF559B79),
@@ -40,32 +43,81 @@ class _AddChildScreenState extends State<AddChildScreen> {
   void initState() {
     super.initState();
 
-    if (widget.childData != null) {
+    final data = widget.childData;
+    final childId = data?['childId'];
+
+    if (data != null && childId is String && childId.isNotEmpty) {
       _isEditing = true;
-      _nameController.text = widget.childData!['nombre'] ?? '';
-      _ageController.text = widget.childData!['edad']?.toString() ?? '';
+      _editingChildId = childId;
+      _nameController.text = data['nombre']?.toString() ?? '';
+      _ageController.text = data['edad']?.toString() ?? '';
+
+      final color = data['color'];
+      if (color is int) {
+        final index =
+            _avatarColors.indexWhere((c) => c.toARGB32() == color);
+        if (index >= 0) {
+          _selectedColorIndex = index;
+        } else {
+          // A colour that is no longer in the palette: kept as an option.
+          _avatarColors.add(Color(color));
+          _selectedColorIndex = _avatarColors.length - 1;
+        }
+      }
+    }
+  }
+
+  Future<void> _updateChild(String nombre, int edad) async {
+    final childId = _editingChildId!;
+    final original = widget.childData!;
+    final color = _avatarColors[_selectedColorIndex].toARGB32();
+
+    setState(() => _isLoading = true);
+
+    try {
+      await ChildProfileService.update(
+        childId,
+        nombre: nombre != original['nombre'] ? nombre : null,
+        edad: edad != original['edad'] ? edad : null,
+        color: color != original['color'] ? color : null,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tr('Perfil actualizado.'))),
+      );
+
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr('No se pudo actualizar el perfil: {0}', [e]))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _saveChild() async {
-    if (_isEditing) {
+    final nombre = _nameController.text.trim();
+    final edad = int.tryParse(_ageController.text.trim());
+
+    if (nombre.isEmpty || nombre.length > 80 || edad == null || edad < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La edición de perfiles todavía no está disponible.'),
+        SnackBar(
+          content: Text(tr('Introduce un nombre (máx. 80) y una edad válida.')),
         ),
       );
       return;
     }
 
-    final nombre = _nameController.text.trim();
-    final edad = int.tryParse(_ageController.text.trim());
-
-    if (nombre.isEmpty || edad == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Introduce un nombre y una edad válida.'),
-        ),
-      );
+    if (_isEditing) {
+      await _updateChild(nombre, edad);
       return;
     }
 
@@ -79,102 +131,20 @@ class _AddChildScreenState extends State<AddChildScreen> {
       );
 
       final pairingCode = result['pairingCode'] as String;
+      final childId = result['childId'] as String;
 
       if (!mounted) return;
 
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          backgroundColor: _ivory,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(26),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle_rounded, color: Color(0xFF559B79)),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Perfil creado',
-                  style: TextStyle(
-                    color: _dark,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Introduce este código en Vesta Tracker para vincular el dispositivo:',
-                style: TextStyle(color: _dark, height: 1.5),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9DCE0),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: _rose.withOpacity(0.35)),
-                ),
-                child: SelectableText(
-                  pairingCode,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _wine,
-                    fontSize: 27,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 4,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'El código es de un solo uso. Guárdalo antes de continuar.',
-                style: TextStyle(color: _muted, fontSize: 13, height: 1.4),
-              ),
-            ],
-          ),
-          actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
-          actions: [
-            TextButton.icon(
-              onPressed: () async {
-                await Clipboard.setData(
-                  ClipboardData(text: pairingCode),
-                );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tr('Perfil creado.'))),
+      );
 
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Código copiado.')),
-                  );
-                }
-              },
-              icon: const Icon(Icons.copy_rounded),
-              label: const Text('Copiar código'),
-              style: TextButton.styleFrom(foregroundColor: _wine),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _wine,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: const Text('Continuar'),
-            ),
-          ],
-        ),
+      await showPairingSheet(
+        context,
+        childId: childId,
+        childName: nombre,
+        pairingCode: pairingCode,
+        expiresAt: DateTime.now().add(const Duration(hours: 24)),
       );
 
       if (mounted) context.go('/');
@@ -183,7 +153,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo crear el perfil: $e')),
+          SnackBar(content: Text(tr('No se pudo crear el perfil: {0}', [e]))),
         );
       }
     } finally {
@@ -260,7 +230,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(selected ? 0.48 : 0.18),
+                  color: color.withValues(alpha: selected ? 0.48 : 0.18),
                   blurRadius: selected ? 15 : 7,
                   spreadRadius: selected ? 2 : 0,
                 ),
@@ -281,7 +251,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = _isEditing ? 'Editar perfil' : 'Nuevo menor';
+    final title = _isEditing ? tr('Editar perfil') : tr('Nuevo menor');
 
     return Scaffold(
       backgroundColor: _dark,
@@ -328,7 +298,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: _rose.withOpacity(0.38),
+                          color: _rose.withValues(alpha: 0.38),
                           blurRadius: 25,
                           spreadRadius: 2,
                         ),
@@ -343,7 +313,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  _isEditing ? 'Actualiza la información' : 'Añadir dispositivo',
+                  _isEditing ? tr('Actualiza la información') : tr('Añadir dispositivo'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: _ivory,
@@ -354,11 +324,11 @@ class _AddChildScreenState extends State<AddChildScreen> {
                 const SizedBox(height: 8),
                 Text(
                   _isEditing
-                      ? 'Información del perfil del menor'
-                      : 'Crea un perfil para comenzar la vinculación con Vesta Tracker.',
+                      ? tr('Información del perfil del menor')
+                      : tr('Crea un perfil para comenzar la vinculación con Vesta Tracker.'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: _ivory.withOpacity(0.72),
+                    color: _ivory.withValues(alpha: 0.72),
                     fontSize: 13,
                     height: 1.5,
                   ),
@@ -370,11 +340,11 @@ class _AddChildScreenState extends State<AddChildScreen> {
                     color: _ivory,
                     borderRadius: BorderRadius.circular(27),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.22),
+                        color: Colors.black.withValues(alpha: 0.22),
                         blurRadius: 28,
                         offset: const Offset(0, 12),
                       ),
@@ -383,8 +353,8 @@ class _AddChildScreenState extends State<AddChildScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Información del perfil',
+                      Text(
+                        tr('Información del perfil'),
                         style: TextStyle(
                           color: _dark,
                           fontSize: 17,
@@ -392,8 +362,8 @@ class _AddChildScreenState extends State<AddChildScreen> {
                         ),
                       ),
                       const SizedBox(height: 7),
-                      const Text(
-                        'Completa los datos para identificar el dispositivo.',
+                      Text(
+                        tr('Completa los datos para identificar el dispositivo.'),
                         style: TextStyle(
                           color: _muted,
                           fontSize: 12,
@@ -402,21 +372,21 @@ class _AddChildScreenState extends State<AddChildScreen> {
                       const SizedBox(height: 23),
                       _buildField(
                         controller: _nameController,
-                        label: 'Nombre del menor',
-                        hint: 'Introduce su nombre',
+                        label: tr('Nombre del menor'),
+                        hint: tr('Introduce su nombre'),
                         icon: Icons.person_outline_rounded,
                       ),
                       const SizedBox(height: 17),
                       _buildField(
                         controller: _ageController,
-                        label: 'Edad',
-                        hint: 'Introduce su edad',
+                        label: tr('Edad'),
+                        hint: tr('Introduce su edad'),
                         icon: Icons.cake_outlined,
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 27),
-                      const Text(
-                        'Color identificador',
+                      Text(
+                        tr('Color identificador'),
                         style: TextStyle(
                           color: _dark,
                           fontWeight: FontWeight.w800,
@@ -424,8 +394,8 @@ class _AddChildScreenState extends State<AddChildScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
-                        'Selecciona un color para reconocer este perfil.',
+                      Text(
+                        tr('Selecciona un color para reconocer este perfil.'),
                         style: TextStyle(
                           color: _muted,
                           fontSize: 12,
@@ -445,7 +415,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
                             borderRadius: BorderRadius.circular(17),
                             boxShadow: [
                               BoxShadow(
-                                color: _rose.withOpacity(0.32),
+                                color: _rose.withValues(alpha: 0.32),
                                 blurRadius: 15,
                                 offset: const Offset(0, 6),
                               ),
@@ -478,8 +448,8 @@ class _AddChildScreenState extends State<AddChildScreen> {
                                       const SizedBox(width: 10),
                                       Text(
                                         _isEditing
-                                            ? 'Actualizar información'
-                                            : 'Registrar menor',
+                                            ? tr('Actualizar información')
+                                            : tr('Registrar menor'),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 15,
@@ -503,7 +473,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
                             }
                           },
                           icon: const Icon(Icons.arrow_back_rounded),
-                          label: const Text('Cancelar'),
+                          label: Text(tr('Cancelar')),
                           style: TextButton.styleFrom(
                             foregroundColor: _wine,
                             shape: RoundedRectangleBorder(
@@ -522,14 +492,14 @@ class _AddChildScreenState extends State<AddChildScreen> {
                     Icon(
                       Icons.shield_outlined,
                       size: 15,
-                      color: _ivory.withOpacity(0.65),
+                      color: _ivory.withValues(alpha: 0.65),
                     ),
                     const SizedBox(width: 7),
                     Text(
-                      'VESTA · Protección y tranquilidad',
+                      tr('VESTA · Protección y tranquilidad'),
                       style: TextStyle(
-                        color: _ivory.withOpacity(0.65),
-                        fontSize: 11,
+                        color: _ivory.withValues(alpha: 0.65),
+                        fontSize: 12,
                         letterSpacing: 0.7,
                       ),
                     ),
