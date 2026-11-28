@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -77,6 +78,9 @@ class NotificationService {
   Future<void> inicializarNotificaciones() async {
     if (_initialized) return;
     _initialized = true;
+    // Web panel: no push yet (needs a service worker and a VAPID key); the
+    // alerts screen updates live from Firestore while the page is open.
+    if (kIsWeb) return;
 
     const initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -164,7 +168,10 @@ class NotificationService {
 
   /// Call after the user changes the app language, so the server sends
   /// this device's pushes in the new language.
-  Future<void> syncLanguage() => _saveCurrentToken();
+  Future<void> syncLanguage() async {
+    if (kIsWeb) return;
+    await _saveCurrentToken();
+  }
 
   Future<void> _saveCurrentToken() async {
     try {
@@ -201,6 +208,7 @@ class NotificationService {
 
   /// Must be called BEFORE signing out (there are still permissions to delete).
   Future<void> unregisterCurrentDevice() async {
+    if (kIsWeb) return;
     final user = _auth.currentUser;
     try {
       final token = await _fcm.getToken();
@@ -237,6 +245,7 @@ class NotificationService {
     String kind = 'alert',
     bool yaFormateado = false,
   }) async {
+    if (kIsWeb) return;
     if (alertId != null && !_shownAlertIds.add(alertId)) return;
 
     final androidDetails = AndroidNotificationDetails(

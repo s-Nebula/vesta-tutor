@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,7 +9,8 @@ import 'package:vesta_app/l10n/tr.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  // On the web, Google and GitHub sign-in use Firebase's pop-up instead.
+  final GoogleSignIn? _googleSignIn = kIsWeb ? null : GoogleSignIn();
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -82,8 +84,9 @@ class AuthService {
   }
 
   Future<bool> signInWithGoogle() async {
+    if (kIsWeb) return _signInWithPopup(GoogleAuthProvider(), 'Google');
     try {
-      final googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn!.signIn();
       if (googleUser == null) return false;
 
       final googleAuth = await googleUser.authentication;
@@ -111,7 +114,30 @@ class AuthService {
     }
   }
 
+  /// Web: Firebase's sign-in pop-up for Google or GitHub.
+  Future<bool> _signInWithPopup(AuthProvider provider, String name) async {
+    try {
+      final result = await _auth.signInWithPopup(provider);
+      if (result.user != null) {
+        await _ensureUserDocument(
+          result.user!,
+          username: result.user!.displayName,
+        );
+      }
+      return result.user != null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'popup-closed-by-user' ||
+          e.code == 'cancelled-popup-request') {
+        return false;
+      }
+      throw Exception(_handleAuthError(e.code));
+    } catch (e) {
+      throw Exception(tr('No se pudo iniciar sesión con {0}: {1}', [name, e]));
+    }
+  }
+
   Future<bool> signInWithGitHub() async {
+    if (kIsWeb) return _signInWithPopup(GithubAuthProvider(), 'GitHub');
     try {
       final result = await _auth.signInWithProvider(
         GithubAuthProvider(),
@@ -141,7 +167,7 @@ class AuthService {
     await NotificationService.instance.unregisterCurrentDevice();
     await _auth.signOut();
     try {
-      await _googleSignIn.signOut();
+      await _googleSignIn?.signOut();
     } catch (_) {
       // No Google session or no network: does not prevent signing out of Vesta.
     }
@@ -168,9 +194,12 @@ class AuthService {
         await user.reauthenticateWithCredential(
           EmailAuthProvider.credential(email: email, password: password),
         );
+      } else if (providers.contains('google.com') && kIsWeb) {
+        await user.reauthenticateWithPopup(GoogleAuthProvider());
       } else if (providers.contains('google.com')) {
-        await _googleSignIn.signOut().catchError((_) => null);
-        final googleUser = await _googleSignIn.signIn();
+        final google = _googleSignIn!;
+        await google.signOut().catchError((_) => null);
+        final googleUser = await google.signIn();
         if (googleUser == null) return false;
         final googleAuth = await googleUser.authentication;
         await user.reauthenticateWithCredential(
@@ -180,12 +209,20 @@ class AuthService {
           ),
         );
       } else if (providers.contains('github.com')) {
-        await user.reauthenticateWithProvider(GithubAuthProvider());
+        if (kIsWeb) {
+          await user.reauthenticateWithPopup(GithubAuthProvider());
+        } else {
+          await user.reauthenticateWithProvider(GithubAuthProvider());
+        }
       } else {
         throw Exception(tr('No se pudo confirmar tu identidad.'));
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'web-context-canceled' || e.code == 'canceled') return false;
+      if (e.code == 'web-context-canceled' ||
+          e.code == 'canceled' ||
+          e.code == 'popup-closed-by-user') {
+        return false;
+      }
       throw Exception(_handleAuthError(e.code));
     }
 
@@ -206,7 +243,7 @@ class AuthService {
       await _auth.signOut();
     } catch (_) {}
     try {
-      await _googleSignIn.signOut();
+      await _googleSignIn?.signOut();
     } catch (_) {}
     return true;
   }

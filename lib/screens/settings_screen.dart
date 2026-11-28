@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vesta_app/widgets/update_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -178,6 +179,7 @@ class SettingsScreen extends StatelessWidget {
               onTap: () => context.push('/privacy'),
             ),
           ),
+          UpdateCard(header: _section(tr('ACTUALIZACIONES'))),
           _section(tr('CUENTA')),
           Card(
             child: Column(

@@ -8,6 +8,7 @@ import 'theme/vesta_theme.dart';
 import 'package:vesta_app/firebase_options.dart';
 import 'package:vesta_app/core/router/app_router.dart';
 import 'package:vesta_app/services/notification_service.dart';
+import 'package:vesta_app/services/app_updater.dart';
 import 'package:vesta_app/widgets/offline_banner.dart';
 
 import 'package:vesta_app/l10n/tr.dart';
@@ -47,6 +48,46 @@ void main() async {
   );
 
   unawaited(_inicializarNotificaciones());
+  unawaited(_comprobarActualizacion(appRouter.router));
+}
+
+/// Checks for a new version when the app opens. If the published version
+/// marks this one as no longer supported (minVersionCode), it blocks the
+/// app until it is updated.
+Future<void> _comprobarActualizacion(GoRouter router) async {
+  final status = await AppUpdater.checkOnLaunch();
+  if (status == null || !status.mandatory) return;
+
+  final context = router.routerDelegate.navigatorKey.currentContext;
+  if (context == null || !context.mounted) return;
+
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(tr('Actualización obligatoria')),
+        content: Text(
+          tr('Esta versión de Vesta ya no es compatible. Instala la versión {0} para seguir usando la app.', [status.availableVersionName ?? '']),
+        ),
+        actions: [
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: VestaTheme.wine),
+            onPressed: () async {
+              final current = await AppUpdater.status();
+              if (current.canInstall) {
+                await AppUpdater.checkNow();
+              } else {
+                await AppUpdater.openInstallSettings();
+              }
+            },
+            child: Text(tr('Actualizar')),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 Future<void> _inicializarNotificaciones() async {
@@ -93,9 +134,37 @@ class MyApp extends StatelessWidget {
         final scaler = media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.6);
         return MediaQuery(
           data: media.copyWith(textScaler: scaler),
-          child: OfflineBanner(child: child ?? const SizedBox()),
+          child: OfflineBanner(child: _WideScreenFrame(child: child ?? const SizedBox())),
         );
       },
+    );
+  }
+}
+
+/// Web panel on a computer: the app is designed for a phone, so on wide
+/// windows it is shown as a centred column instead of stretched.
+class _WideScreenFrame extends StatelessWidget {
+  const _WideScreenFrame({required this.child});
+
+  final Widget child;
+  static const double _maxWidth = 600;
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    if (media.size.width <= _maxWidth + 40) return child;
+
+    return ColoredBox(
+      color: VestaTheme.background,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _maxWidth),
+          child: MediaQuery(
+            data: media.copyWith(size: Size(_maxWidth, media.size.height)),
+            child: Material(elevation: 6, child: child),
+          ),
+        ),
+      ),
     );
   }
 }

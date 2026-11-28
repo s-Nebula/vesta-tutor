@@ -61,6 +61,61 @@ class DashboardScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _eliminarPerfil(
+    BuildContext context,
+    String hijoId,
+    String nombre,
+    bool compartido,
+  ) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(tr('¿Eliminar el perfil de {0}?', [nombre])),
+        content: Text(
+          compartido
+              ? tr('Otros tutores comparten este perfil: dejará de aparecer en tu panel, pero ellos lo conservarán con todos sus datos.')
+              : tr('Se borrarán su historial de ubicación, alertas, reportes, zonas y ajustes, y se desvinculará su teléfono. Esta acción no se puede deshacer.'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(tr('Cancelar')),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: VestaTheme.wine),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(tr('Eliminar')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true || !context.mounted) return;
+
+    try {
+      final borrado = await ChildProfileService.delete(hijoId);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              borrado
+                  ? tr('Perfil de {0} eliminado.', [nombre])
+                  : tr('Ya no compartes el perfil de {0}.', [nombre]),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error al eliminar el perfil: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr('Error al eliminar el perfil: {0}', [e]))),
+        );
+      }
+    }
+  }
+
   void _editarPerfil(
     BuildContext context,
     String hijoId,
@@ -443,6 +498,14 @@ class DashboardScreen extends StatelessWidget {
                         );
                       case 'unlink':
                         _desvincularHijo(context, hijoId, nombre);
+                      case 'delete':
+                        final parentIds = hijo['parentIds'];
+                        _eliminarPerfil(
+                          context,
+                          hijoId,
+                          nombre,
+                          parentIds is List && parentIds.length > 1,
+                        );
                     }
                   },
                   itemBuilder: (context) => [
@@ -475,6 +538,17 @@ class DashboardScreen extends StatelessWidget {
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.delete_outline_rounded,
+                          color: VestaTheme.rose,
+                        ),
+                        title: Text(tr('Eliminar perfil')),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
                   ],
                 ),
               ],

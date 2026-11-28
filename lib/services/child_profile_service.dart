@@ -42,6 +42,13 @@ class ChildProfileService {
     return result['pairingCode'] as String? ?? '';
   }
 
+  /// Deletes the profile. If other guardians share it, only this guardian
+  /// leaves it and it stays with them. Returns true if it was deleted.
+  static Future<bool> delete(String childId) async {
+    final result = await VestaApiClient.delete(_path(childId));
+    return result['result'] == 'deleted';
+  }
+
   /// QR content read by Vesta Tracker (see PairingPayload in the Tracker).
   static String qrPayload(String pairingCode) =>
       'vesta://link?code=${pairingCode.toUpperCase()}';

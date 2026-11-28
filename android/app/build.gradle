@@ -65,6 +65,26 @@ android {
             v2SigningEnabled true
         }
     }
+    // "web": APK from vestasecurity.date/downloads, updates itself
+    //        (src/web: updater, REQUEST_INSTALL_PACKAGES).
+    // "play": Google Play, which installs the updates (src/play: no updater).
+    // Same applicationId and key; build with --flavor web|play
+    // (pubspec.yaml: default-flavor web).
+    flavorDimensions = ["store"]
+    productFlavors {
+        web {
+            dimension "store"
+            buildConfigField "String", "UPDATE_MANIFEST_URL", '"https://vestasecurity.date/downloads/version.json"'
+        }
+        play {
+            dimension "store"
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             // CORRECCIÓN: Nunca uses debug en release. 

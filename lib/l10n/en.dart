@@ -963,4 +963,48 @@ const Map<String, String> enStrings = {
       'Delete account permanently',
   'También puedes pedir la eliminación sin la app en vestasecurity.date/eliminar-cuenta.':
       'You can also request deletion without the app at vestasecurity.date/en/delete-account.',
+  '¿Eliminar el perfil de {0}?':
+      'Delete {0}\'s profile?',
+  'Otros tutores comparten este perfil: dejará de aparecer en tu panel, pero ellos lo conservarán con todos sus datos.':
+      'Other guardians share this profile: it will disappear from your dashboard, but they will keep it with all its data.',
+  'Se borrarán su historial de ubicación, alertas, reportes, zonas y ajustes, y se desvinculará su teléfono. Esta acción no se puede deshacer.':
+      'Their location history, alerts, reports, zones and settings will be deleted, and their phone will be unlinked. This cannot be undone.',
+  'Perfil de {0} eliminado.':
+      '{0}\'s profile deleted.',
+  'Ya no compartes el perfil de {0}.':
+      'You no longer share {0}\'s profile.',
+  'Error al eliminar el perfil: {0}':
+      'Error deleting the profile: {0}',
+  'Eliminar perfil':
+      'Delete profile',
+  'Ya tienes la última versión.':
+      'You have the latest version.',
+  'Buscando actualizaciones…':
+      'Checking for updates…',
+  'No se pudo actualizar: {0}':
+      'Could not update: {0}',
+  'Versión {0} descargada; instalando.':
+      'Version {0} downloaded; installing.',
+  'Versión {0} disponible.':
+      'Version {0} available.',
+  'Se actualiza sola cuando publicamos una versión nueva.':
+      'It updates itself when we publish a new version.',
+  'Versión {0}':
+      'Version {0}',
+  'Permitir actualizaciones automáticas':
+      'Allow automatic updates',
+  'Android pide que autorices una vez a Vesta para instalar sus propias actualizaciones.':
+      'Android asks you to allow Vesta once to install its own updates.',
+  'Buscar actualizaciones':
+      'Check for updates',
+  'ACTUALIZACIONES':
+      'UPDATES',
+  'Actualización obligatoria':
+      'Update required',
+  'Esta versión de Vesta ya no es compatible. Instala la versión {0} para seguir usando la app.':
+      'This version of Vesta is no longer supported. Install version {0} to keep using the app.',
+  'Actualizar':
+      'Update',
+  'No se pudo iniciar sesión con {0}: {1}':
+      'Could not sign in with {0}: {1}',
 };
