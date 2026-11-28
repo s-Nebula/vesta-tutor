@@ -13,6 +13,7 @@ import 'package:vesta_app/screens/filters_screen.dart';
 import 'package:vesta_app/screens/alerts_screen.dart';
 import 'package:vesta_app/screens/reports_screen.dart';
 import 'package:vesta_app/screens/device_status_screen.dart';
+import 'package:vesta_app/widgets/responsive.dart';
 import 'package:vesta_app/widgets/vesta_header.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 
@@ -118,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _open(Widget screen) {
     if (!mounted) return;
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => NarrowOnWide(maxWidth: 760, child: screen)),
+    );
   }
 
   Widget _quickActions() {
@@ -352,88 +355,160 @@ class _HomeScreenState extends State<HomeScreen> {
       DeviceStatusScreen(childId: widget.childId),
     ];
 
+    final content = IndexedStack(
+      index: _currentTabIndex,
+      children: screens,
+    );
+
+    // Computer: side panel with the profile and the sections, content on
+    // the right. Phone: everything stacked vertically.
+    if (Responsive.isWide(context)) {
+      return Scaffold(
+        backgroundColor: VestaTheme.background,
+        body: SafeArea(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: 330,
+                child: Column(
+                  children: [
+                    _header(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _profileBadge(childName),
+                            _studyModeCard(),
+                            _quickActions(),
+                            _buildSideNav(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              VerticalDivider(
+                width: 1,
+                color: VestaTheme.beige.withValues(alpha: 0.12),
+              ),
+              Expanded(child: content),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: VestaTheme.background,
       body: SafeArea(
         child: Column(
           children: [
-            Stack(
-              children: [
-                const Center(child: VestaHeader(isDark: true)),
-                Positioned(
-                  top: 15,
-                  right: 14,
-                  child: Material(
-                    color: VestaTheme.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () => context.go('/'),
-                      child: const Padding(
-                        padding: EdgeInsets.all(11),
-                        child: Icon(
-                          Icons.people_alt_rounded,
-                          color: VestaTheme.beige,
-                          size: 21,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: VestaTheme.surface,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: VestaTheme.beige.withValues(alpha: 0.12),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.person_rounded,
-                    color: VestaTheme.rose,
-                    size: 19,
-                  ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: Text(
-                      tr('PERFIL: {0}', [childName.toUpperCase()]),
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: VestaTheme.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ),
-                  const Icon(
-                    Icons.verified_user_rounded,
-                    color: VestaTheme.rose,
-                    size: 17,
-                  ),
-                ],
-              ),
-            ),
+            _header(),
+            _profileBadge(childName),
             _studyModeCard(),
             _quickActions(),
             _buildNavbar(),
-            Expanded(
-              child: IndexedStack(
-                index: _currentTabIndex,
-                children: screens,
-              ),
-            ),
+            Expanded(child: content),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _header() {
+    return Stack(
+      children: [
+        const Center(child: VestaHeader(isDark: true)),
+        Positioned(
+          top: 15,
+          right: 14,
+          child: Material(
+            color: VestaTheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () => context.go('/'),
+              child: const Padding(
+                padding: EdgeInsets.all(11),
+                child: Icon(
+                  Icons.people_alt_rounded,
+                  color: VestaTheme.beige,
+                  size: 21,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _profileBadge(String childName) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+      decoration: BoxDecoration(
+        color: VestaTheme.surface,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: VestaTheme.beige.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.person_rounded,
+            color: VestaTheme.rose,
+            size: 19,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              tr('PERFIL: {0}', [childName.toUpperCase()]),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: VestaTheme.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          const Icon(
+            Icons.verified_user_rounded,
+            color: VestaTheme.rose,
+            size: 17,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSideNav() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: VestaTheme.surface,
+        borderRadius: BorderRadius.circular(19),
+        border: Border.all(
+          color: VestaTheme.beige.withValues(alpha: 0.10),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (int i = 0; i < _labels.length; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: _navButton(i, vertical: true),
+            ),
+        ],
       ),
     );
   }
@@ -458,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _navButton(int index) {
+  Widget _navButton(int index, {bool vertical = false}) {
     final active = _currentTabIndex == index;
 
     return Padding(
@@ -481,9 +556,12 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(14),
           onTap: () => _selectTab(index),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            padding: vertical
+                ? const EdgeInsets.symmetric(vertical: 13, horizontal: 16)
+                : const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+            child: Flex(
+              direction: vertical ? Axis.horizontal : Axis.vertical,
+              mainAxisSize: vertical ? MainAxisSize.max : MainAxisSize.min,
               children: [
                 index == HomeScreen.alertsTab
                     ? StreamBuilder<int>(
@@ -510,13 +588,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         color:
                             active ? Colors.white : VestaTheme.textSecondary,
                       ),
-                const SizedBox(height: 4),
+                SizedBox(height: vertical ? 0 : 4, width: vertical ? 14 : 0),
                 Text(
                   _labels[index],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: vertical ? 14 : 12,
                     fontWeight: FontWeight.bold,
                     color: active ? Colors.white : VestaTheme.textSecondary,
                   ),

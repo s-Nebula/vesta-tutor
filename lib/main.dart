@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
@@ -21,6 +23,20 @@ void main() async {
     );
   } catch (e) {
     debugPrint("Error al inicializar Firebase: $e");
+  }
+
+  // Development only: --dart-define=VESTA_FIREBASE_EMULATOR=127.0.0.1 uses
+  // the local Auth and Firestore emulators instead of Firebase.
+  const emulatorHost = String.fromEnvironment('VESTA_FIREBASE_EMULATOR');
+  if (emulatorHost.isNotEmpty) {
+    await FirebaseAuth.instance.useAuthEmulator(
+      emulatorHost,
+      const int.fromEnvironment('VESTA_AUTH_EMULATOR_PORT', defaultValue: 9099),
+    );
+    FirebaseFirestore.instance.useFirestoreEmulator(
+      emulatorHost,
+      const int.fromEnvironment('VESTA_FIRESTORE_EMULATOR_PORT', defaultValue: 8080),
+    );
   }
 
   await LanguageNotifier.load();
@@ -128,43 +144,17 @@ class MyApp extends StatelessWidget {
       darkTheme: VestaTheme.darkTheme,
       themeMode: brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
+      scaffoldMessengerKey: NotificationService.messengerKey,
       builder: (context, child) {
         // Honour the system text size, with a readable minimum.
         final media = MediaQuery.of(context);
         final scaler = media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.6);
         return MediaQuery(
           data: media.copyWith(textScaler: scaler),
-          child: OfflineBanner(child: _WideScreenFrame(child: child ?? const SizedBox())),
+          child: OfflineBanner(child: child ?? const SizedBox()),
         );
       },
     );
   }
 }
 
-/// Web panel on a computer: the app is designed for a phone, so on wide
-/// windows it is shown as a centred column instead of stretched.
-class _WideScreenFrame extends StatelessWidget {
-  const _WideScreenFrame({required this.child});
-
-  final Widget child;
-  static const double _maxWidth = 600;
-
-  @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    if (media.size.width <= _maxWidth + 40) return child;
-
-    return ColoredBox(
-      color: VestaTheme.background,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: _maxWidth),
-          child: MediaQuery(
-            data: media.copyWith(size: Size(_maxWidth, media.size.height)),
-            child: Material(elevation: 6, child: child),
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vesta_app/services/child_profile_service.dart';
 import 'package:vesta_app/widgets/pairing_card.dart';
+import 'package:vesta_app/widgets/responsive.dart';
 import 'package:vesta_app/theme/vesta_theme.dart';
 
 import 'package:vesta_app/l10n/tr.dart';
@@ -199,6 +200,79 @@ class DashboardScreen extends StatelessWidget {
                   final data = doc.data() as Map<String, dynamic>;
                   return data['status'] == 'vinculado';
                 }).length;
+
+                final cabecera = Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        tr('DISPOSITIVOS FAMILIARES'),
+                        style: TextStyle(
+                          color: VestaTheme.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    _counter(hijos.length),
+                  ],
+                );
+
+                // Computer: summary on the left, minors in a grid.
+                if (Responsive.isWide(context)) {
+                  return Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1400),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          const gap = 14.0;
+                          final gridWidth = constraints.maxWidth - 64 - 340 - 28;
+                          final columns = gridWidth >= 900 ? 3 : (gridWidth >= 560 ? 2 : 1);
+                          final cardWidth = (gridWidth - gap * (columns - 1)) / columns;
+
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(32, 20, 32, 110),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 340,
+                                  child: _welcomeCard(hijos.length, vinculados),
+                                ),
+                                const SizedBox(width: 28),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      cabecera,
+                                      const SizedBox(height: 14),
+                                      Wrap(
+                                        spacing: gap,
+                                        runSpacing: gap,
+                                        children: [
+                                          for (final doc in hijos)
+                                            SizedBox(
+                                              width: cardWidth,
+                                              child: _childCard(
+                                                context,
+                                                doc.data() as Map<String, dynamic>,
+                                                doc.id,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
 
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(18, 12, 18, 110),

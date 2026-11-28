@@ -1007,4 +1007,18 @@ const Map<String, String> enStrings = {
       'Update',
   'No se pudo iniciar sesión con {0}: {1}':
       'Could not sign in with {0}: {1}',
+  'Ver':
+      'View',
+  'No se pudieron activar: {0}':
+      'Could not turn them on: {0}',
+  'Notificaciones en este navegador':
+      'Notifications in this browser',
+  'Activadas. Recibirás las alertas aunque la página esté cerrada, mientras el navegador esté abierto.':
+      'On. You will get alerts even with the page closed, while the browser is running.',
+  'Bloqueadas. Permítelas en los ajustes del sitio de tu navegador (icono del candado junto a la dirección).':
+      'Blocked. Allow them in your browser\'s site settings (padlock icon next to the address).',
+  'Recibe las alertas en este ordenador o móvil. En iPhone, primero añade Vesta a la pantalla de inicio.':
+      'Get alerts on this computer or phone. On iPhone, first add Vesta to the home screen.',
+  'Activar':
+      'Turn on',
 };

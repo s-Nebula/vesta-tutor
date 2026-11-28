@@ -15,6 +15,7 @@ import 'package:vesta_app/screens/delete_account_screen.dart';
 import 'package:vesta_app/screens/settings_screen.dart';
 import 'package:vesta_app/widgets/link_access_gate.dart';
 import 'package:vesta_app/widgets/privacy_access_gate.dart';
+import 'package:vesta_app/widgets/responsive.dart';
 
 import 'package:vesta_app/l10n/tr.dart';
 class AppRouter {
@@ -73,36 +74,38 @@ class AppRouter {
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => const NarrowOnWide(child: LoginScreen()),
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) => const NarrowOnWide(child: RegisterScreen()),
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        builder: (context, state) => const NarrowOnWide(child: ForgotPasswordScreen()),
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => const NarrowOnWide(child: SettingsScreen()),
       ),
       GoRoute(
         path: '/delete-account',
-        builder: (context, state) => const DeleteAccountScreen(),
+        builder: (context, state) => const NarrowOnWide(child: DeleteAccountScreen()),
       ),
       GoRoute(
         path: '/privacy',
-        builder: (context, state) => const PrivacyConsentScreen(),
+        builder: (context, state) => const NarrowOnWide(child: PrivacyConsentScreen()),
       ),
       GoRoute(
         path: '/add-child',
-        builder: (context, state) => PrivacyAccessGate(
-          child: LinkAccessGate(
-            allowWhenNoChildren: true,
-            allowUnlinkedChildren: true,
-            child: AddChildScreen(
-              childData: state.extra as Map<String, dynamic>?,
+        builder: (context, state) => NarrowOnWide(
+          child: PrivacyAccessGate(
+            child: LinkAccessGate(
+              allowWhenNoChildren: true,
+              allowUnlinkedChildren: true,
+              child: AddChildScreen(
+                childData: state.extra as Map<String, dynamic>?,
+              ),
             ),
           ),
         ),
@@ -142,16 +145,25 @@ class AppRouter {
 
             switch (route) {
               case 'filters':
-                return _protected(
-                  FiltersScreen(childId: childId, tutorId: tutorId),
+                return NarrowOnWide(
+                  maxWidth: 900,
+                  child: _protected(
+                    FiltersScreen(childId: childId, tutorId: tutorId),
+                  ),
                 );
               case 'alerts':
-                return _protected(
-                  AlertsScreen(childId: childId, tutorId: tutorId),
+                return NarrowOnWide(
+                  maxWidth: 900,
+                  child: _protected(
+                    AlertsScreen(childId: childId, tutorId: tutorId),
+                  ),
                 );
               case 'reports':
-                return _protected(
-                  ReportsScreen(childId: childId, tutorId: tutorId),
+                return NarrowOnWide(
+                  maxWidth: 900,
+                  child: _protected(
+                    ReportsScreen(childId: childId, tutorId: tutorId),
+                  ),
                 );
               default:
                 return _protected(const DashboardScreen());

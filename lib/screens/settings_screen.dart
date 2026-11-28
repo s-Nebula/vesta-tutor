@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vesta_app/widgets/update_card.dart';
+import 'package:vesta_app/widgets/web_push_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -144,6 +145,10 @@ class SettingsScreen extends StatelessWidget {
               return Card(
                 child: Column(
                   children: [
+                    if (WebPushTile.visible) ...[
+                      const WebPushTile(),
+                      const Divider(height: 1),
+                    ],
                     SwitchListTile(
                       secondary: const Icon(Icons.notifications_active_rounded),
                       title: Text(tr('Solo alertas críticas al instante')),

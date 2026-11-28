@@ -27,6 +27,14 @@ class NotificationService {
   factory NotificationService() => instance;
 
   static const String channelId = 'vesta_alerts';
+
+  /// Web push key (Firebase console > Cloud Messaging > Web Push
+  /// certificates). Without it the web panel has no push notifications.
+  static const String _vapidKey = String.fromEnvironment('VESTA_VAPID_KEY');
+
+  /// To show notices inside the app (web, page open).
+  static final GlobalKey<ScaffoldMessengerState> messengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   static const String _legacyChannelId = 'vesta_critical_alerts';
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -78,9 +86,10 @@ class NotificationService {
   Future<void> inicializarNotificaciones() async {
     if (_initialized) return;
     _initialized = true;
-    // Web panel: no push yet (needs a service worker and a VAPID key); the
-    // alerts screen updates live from Firestore while the page is open.
-    if (kIsWeb) return;
+    if (kIsWeb) {
+      await _initWeb();
+      return;
+    }
 
     const initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -166,16 +175,84 @@ class NotificationService {
     });
   }
 
+  // ------------------------------------------------------------------ web
+
+  /// Push in this browser: possible (key configured and browser support).
+  bool get webPushAvailable => kIsWeb && _vapidKey.isNotEmpty;
+
+  /// Browser permission: notDetermined, authorized or denied.
+  Future<AuthorizationStatus> webPermission() async {
+    try {
+      return (await _fcm.getNotificationSettings()).authorizationStatus;
+    } catch (_) {
+      return AuthorizationStatus.notDetermined;
+    }
+  }
+
+  /// Asks the browser for permission. Call from a tap (browsers ignore or
+  /// penalise prompts that are not started by the user).
+  Future<AuthorizationStatus> enableWebPush() async {
+    final settings = await _fcm.requestPermission(alert: true, sound: true);
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      await _saveCurrentToken();
+      _tokenSubscription ??= _fcm.onTokenRefresh.listen(_saveToken);
+    }
+    return settings.authorizationStatus;
+  }
+
+  Future<void> _initWeb() async {
+    if (!webPushAvailable) return;
+
+    // Page open: the browser does not show the notification; a notice in
+    // the app does, with a button to the matching screen.
+    _foregroundSubscription ??= FirebaseMessaging.onMessage.listen((message) {
+      final notification = message.notification;
+      final data = message.data;
+      final childId = data['childId']?.toString();
+      final title = notification?.title ?? tr('Alerta');
+      final body = notification?.body;
+      messengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(body == null ? title : '$title\n$body'),
+          duration: const Duration(seconds: 8),
+          action: childId == null
+              ? null
+              : SnackBarAction(
+                  label: tr('Ver'),
+                  onPressed: () => _handleTap(childId, _kindOf(data)),
+                ),
+        ),
+      );
+    });
+
+    // Already allowed in this browser: keep the token up to date. Never ask
+    // here: the permission is requested from Settings.
+    if (await webPermission() == AuthorizationStatus.authorized) {
+      await _saveCurrentToken();
+      _tokenSubscription ??= _fcm.onTokenRefresh.listen(_saveToken);
+      _authSubscription ??= _auth.authStateChanges().listen((user) async {
+        if (user != null) await _saveCurrentToken();
+      });
+    }
+  }
+
+  Future<String?> _getToken() =>
+      kIsWeb ? _fcm.getToken(vapidKey: _vapidKey) : _fcm.getToken();
+
   /// Call after the user changes the app language, so the server sends
   /// this device's pushes in the new language.
   Future<void> syncLanguage() async {
-    if (kIsWeb) return;
+    if (kIsWeb &&
+        (!webPushAvailable ||
+            await webPermission() != AuthorizationStatus.authorized)) {
+      return;
+    }
     await _saveCurrentToken();
   }
 
   Future<void> _saveCurrentToken() async {
     try {
-      final token = await _fcm.getToken();
+      final token = await _getToken();
       if (token != null) await _saveToken(token);
     } catch (e) {
       debugPrint('Error actualizando token FCM: $e');
@@ -199,6 +276,7 @@ class NotificationService {
       await userRef.collection('fcmTokens').doc(token).set({
         'token': token,
         'lang': appLanguage,
+        'platform': kIsWeb ? 'web' : 'android',
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -208,10 +286,14 @@ class NotificationService {
 
   /// Must be called BEFORE signing out (there are still permissions to delete).
   Future<void> unregisterCurrentDevice() async {
-    if (kIsWeb) return;
+    if (kIsWeb &&
+        (!webPushAvailable ||
+            await webPermission() != AuthorizationStatus.authorized)) {
+      return;
+    }
     final user = _auth.currentUser;
     try {
-      final token = await _fcm.getToken();
+      final token = await _getToken();
       if (user != null && token != null) {
         await _db
             .collection('users')
